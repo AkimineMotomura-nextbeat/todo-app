@@ -1,0 +1,16 @@
+@*
+* todo一覧のページ
+*@
+
+@(todos: Seq[model.Todo], vv: model.ViewValueCommon)
+
+@common.Default(vv){
+<ul>
+    @for(todo <- todos){
+        @*
+        *どう表示するかは後で考える
+        *@
+        <li><a href="http://localhost:9000/todo/@todo.id">@todo.title</a></li>
+    }
+</ul>
+}

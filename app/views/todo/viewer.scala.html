@@ -1,0 +1,9 @@
+@*
+* Todoの詳細を表示するページ
+*@
+
+@(todo: model.Todo, vv: model.ViewValueCommon)
+
+@common.Default(vv){
+    <h2>@todo.title</h2>
+}
