@@ -10,8 +10,8 @@ import javax.inject._
 import play.api.mvc._
 
 import model.ViewValueHome
-import model.Todo
-import model.TodoStatus
+import slick.model.Todo
+import slick.model.TodoStatus
 
 @Singleton
 class HomeController @Inject()(val controllerComponents: ControllerComponents) extends BaseController {

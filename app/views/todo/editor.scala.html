@@ -4,7 +4,7 @@
 
 @import helper._
 @import controllers.TodoFormData
-@(todo: model.Todo, form: Form[TodoFormData], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+@(todo: slick.model.Todo, form: Form[TodoFormData], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @common.Default(vv){
     <h2>@todo.title</h2>

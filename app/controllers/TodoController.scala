@@ -13,8 +13,8 @@ import play.api.data.Forms._
 import play.api.data.validation.Constraints._
 
 import model.ViewValueHome
-import model.Todo
-import model.TodoStatus
+import slick.model.Todo
+import slick.model.TodoStatus
 
 case class TodoFormData(
   title: String,
@@ -66,6 +66,7 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents) e
     }else{
       //DBを叩く
       //fetch(id)
+      
       //DBが無いので動作確認用
       todos.find(_.id == id) match{
         case Some(todo) => {

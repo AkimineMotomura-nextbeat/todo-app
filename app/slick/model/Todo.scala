@@ -1,4 +1,6 @@
-package model
+package slick.model
+
+import java.time.LocalDateTime
 
 sealed trait TodoStatus
 
@@ -16,5 +18,8 @@ case class Todo(
   title:  String,
   content: String,
   status: TodoStatus,
-  category: String
+  category: String,
+  postedAt:  LocalDateTime = LocalDateTime.now,
+  createdAt: LocalDateTime = LocalDateTime.now,
+  updatedAt: LocalDateTime = LocalDateTime.now
 ) 
