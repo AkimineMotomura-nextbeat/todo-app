@@ -1,0 +1,18 @@
+@*
+* Todoの詳細を表示するページ
+*@
+
+@import helper._
+@import controllers.TodoFormData
+@(todo: model.Todo, form: Form[TodoFormData], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+
+@common.Default(vv){
+    <h2>@todo.title</h2>
+    @helper.form(action = routes.TodoController.store(todo.id)) {
+        @helper.CSRF.formField
+        @helper.inputText(form("title"))
+        @helper.textarea(form("content"), 'rows -> 7, 'cols -> 40)
+        @helper.inputText(form("category"))
+        <input type="submit" value="登録">
+    }
+}
