@@ -23,17 +23,6 @@ libraryDependencies ++= Seq(
   "mysql"          % "mysql-connector-java" % "5.1.+",
   "ch.qos.logback" % "logback-classic"      % "1.1.+",
 )
-libraryDependencies ++= Seq(
-  guice,
-  evolutions,
-  "org.scalatestplus.play" %% "scalatestplus-play"    % "5.0.0" % Test,
-  "com.typesafe.play"      %% "play-slick"            % "5.0.0",
-  "com.typesafe.play"      %% "play-slick-evolutions" % "5.0.0",
-  "com.typesafe.slick"     %% "slick-codegen"         % "3.3.2",
-  //"mysql"                   % "mysql-connector-java"  % "6.0.6",
-  //
-  "com.typesafe" % "config" % "1.4.0",
-) 
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.example.controllers._"
 

@@ -81,6 +81,7 @@
             "/Users/akimine.motomura/.ivy2/cache/net.ixias/ixias-core_2.12/jars/ixias-core_2.12-1.1.36.jar",
             "/Users/akimine.motomura/.ivy2/cache/com.chuusai/shapeless_2.12/bundles/shapeless_2.12-2.3.3.jar",
             "/Users/akimine.motomura/.ivy2/cache/org.typelevel/macro-compat_2.12/jars/macro-compat_2.12-1.1.1.jar",
+            "/Users/akimine.motomura/.ivy2/cache/com.typesafe.slick/slick_2.12/bundles/slick_2.12-3.2.1.jar",
             "/Users/akimine.motomura/.ivy2/cache/org.typelevel/cats-kernel_2.12/jars/cats-kernel_2.12-2.1.1.jar",
             "/Users/akimine.motomura/.ivy2/cache/org.typelevel/cats-core_2.12/jars/cats-core_2.12-2.1.1.jar",
             "/Users/akimine.motomura/.ivy2/cache/org.typelevel/cats-macros_2.12/jars/cats-macros_2.12-2.1.1.jar",
@@ -89,6 +90,7 @@
             "/Users/akimine.motomura/.ivy2/cache/io.monix/monix-eval_2.12/jars/monix-eval_2.12-2.3.0.jar",
             "/Users/akimine.motomura/.ivy2/cache/io.monix/monix-types_2.12/jars/monix-types_2.12-2.3.0.jar",
             "/Users/akimine.motomura/.ivy2/cache/io.monix/monix-execution_2.12/jars/monix-execution_2.12-2.3.0.jar",
+            "/Users/akimine.motomura/.ivy2/cache/com.zaxxer/HikariCP/bundles/HikariCP-2.5.0.jar",
             "/Users/akimine.motomura/.ivy2/cache/org.keyczar/keyczar/jars/keyczar-0.71h.jar",
             "/Users/akimine.motomura/.ivy2/cache/org.json/json/jars/json-20080701.jar",
             "/Users/akimine.motomura/.ivy2/cache/org.uaparser/uap-scala_2.12/jars/uap-scala_2.12-0.1.0.jar",
@@ -126,16 +128,7 @@
             "/Users/akimine.motomura/.ivy2/cache/net.ixias/ixias-play_2.12/jars/ixias-play_2.12-1.1.36.jar",
             "/Users/akimine.motomura/.ivy2/cache/net.ixias/ixias-play-core_2.12/jars/ixias-play-core_2.12-1.1.36.jar",
             "/Users/akimine.motomura/.ivy2/cache/net.ixias/ixias-play-auth_2.12/jars/ixias-play-auth_2.12-1.1.36.jar",
-            "/Users/akimine.motomura/.ivy2/cache/mysql/mysql-connector-java/jars/mysql-connector-java-6.0.6.jar",
-            "/Users/akimine.motomura/.ivy2/cache/com.typesafe.play/play-jdbc-evolutions_2.12/jars/play-jdbc-evolutions_2.12-2.8.0.jar",
-            "/Users/akimine.motomura/.ivy2/cache/com.typesafe.play/play-jdbc-api_2.12/jars/play-jdbc-api_2.12-2.8.0.jar",
-            "/Users/akimine.motomura/.ivy2/cache/com.typesafe.play/play-slick_2.12/jars/play-slick_2.12-5.0.0.jar",
-            "/Users/akimine.motomura/.ivy2/cache/com.typesafe.slick/slick_2.12/bundles/slick_2.12-3.3.2.jar",
-            "/Users/akimine.motomura/.ivy2/cache/org.scala-lang.modules/scala-collection-compat_2.12/bundles/scala-collection-compat_2.12-2.0.0.jar",
-            "/Users/akimine.motomura/.ivy2/cache/com.typesafe.slick/slick-hikaricp_2.12/bundles/slick-hikaricp_2.12-3.3.2.jar",
-            "/Users/akimine.motomura/.ivy2/cache/com.zaxxer/HikariCP/bundles/HikariCP-3.2.0.jar",
-            "/Users/akimine.motomura/.ivy2/cache/com.typesafe.play/play-slick-evolutions_2.12/jars/play-slick-evolutions_2.12-5.0.0.jar",
-            "/Users/akimine.motomura/.ivy2/cache/com.typesafe.slick/slick-codegen_2.12/jars/slick-codegen_2.12-3.3.2.jar"
+            "/Users/akimine.motomura/.ivy2/cache/mysql/mysql-connector-java/jars/mysql-connector-java-5.1.49.jar"
         ],
         "out": "/Users/akimine.motomura/repositry/todo-app/.bloop/root",
         "classesDir": "/Users/akimine.motomura/repositry/todo-app/.bloop/root/scala-2.12/classes",
@@ -1256,6 +1249,22 @@
                     ]
                 },
                 {
+                    "organization": "com.typesafe.slick",
+                    "name": "slick_2.12",
+                    "version": "3.2.1",
+                    "artifacts": [
+                        {
+                            "name": "slick_2.12",
+                            "path": "/Users/akimine.motomura/.ivy2/cache/com.typesafe.slick/slick_2.12/bundles/slick_2.12-3.2.1.jar"
+                        },
+                        {
+                            "name": "slick_2.12",
+                            "classifier": "sources",
+                            "path": "/Users/akimine.motomura/.ivy2/cache/com.typesafe.slick/slick_2.12/srcs/slick_2.12-3.2.1-sources.jar"
+                        }
+                    ]
+                },
+                {
                     "organization": "org.typelevel",
                     "name": "cats-kernel_2.12",
                     "version": "2.1.1",
@@ -1380,6 +1389,22 @@
                             "name": "monix-execution_2.12",
                             "classifier": "sources",
                             "path": "/Users/akimine.motomura/.ivy2/cache/io.monix/monix-execution_2.12/srcs/monix-execution_2.12-2.3.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.zaxxer",
+                    "name": "HikariCP",
+                    "version": "2.5.0",
+                    "artifacts": [
+                        {
+                            "name": "HikariCP",
+                            "path": "/Users/akimine.motomura/.ivy2/cache/com.zaxxer/HikariCP/bundles/HikariCP-2.5.0.jar"
+                        },
+                        {
+                            "name": "HikariCP",
+                            "classifier": "sources",
+                            "path": "/Users/akimine.motomura/.ivy2/cache/com.zaxxer/HikariCP/srcs/HikariCP-2.5.0-sources.jar"
                         }
                     ]
                 },
@@ -1936,162 +1961,18 @@
                     ]
                 },
                 {
-                    "organization": "com.typesafe.play",
-                    "name": "play-jdbc-evolutions_2.12",
-                    "version": "2.8.0",
-                    "artifacts": [
-                        {
-                            "name": "play-jdbc-evolutions_2.12",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/com.typesafe.play/play-jdbc-evolutions_2.12/jars/play-jdbc-evolutions_2.12-2.8.0.jar"
-                        },
-                        {
-                            "name": "play-jdbc-evolutions_2.12",
-                            "classifier": "sources",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/com.typesafe.play/play-jdbc-evolutions_2.12/srcs/play-jdbc-evolutions_2.12-2.8.0-sources.jar"
-                        }
-                    ]
-                },
-                {
-                    "organization": "com.typesafe.play",
-                    "name": "play-jdbc-api_2.12",
-                    "version": "2.8.0",
-                    "artifacts": [
-                        {
-                            "name": "play-jdbc-api_2.12",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/com.typesafe.play/play-jdbc-api_2.12/jars/play-jdbc-api_2.12-2.8.0.jar"
-                        },
-                        {
-                            "name": "play-jdbc-api_2.12",
-                            "classifier": "sources",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/com.typesafe.play/play-jdbc-api_2.12/srcs/play-jdbc-api_2.12-2.8.0-sources.jar"
-                        }
-                    ]
-                },
-                {
-                    "organization": "com.typesafe.play",
-                    "name": "play-slick_2.12",
-                    "version": "5.0.0",
-                    "artifacts": [
-                        {
-                            "name": "play-slick_2.12",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/com.typesafe.play/play-slick_2.12/jars/play-slick_2.12-5.0.0.jar"
-                        },
-                        {
-                            "name": "play-slick_2.12",
-                            "classifier": "sources",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/com.typesafe.play/play-slick_2.12/srcs/play-slick_2.12-5.0.0-sources.jar"
-                        }
-                    ]
-                },
-                {
-                    "organization": "com.typesafe.slick",
-                    "name": "slick_2.12",
-                    "version": "3.3.2",
-                    "artifacts": [
-                        {
-                            "name": "slick_2.12",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/com.typesafe.slick/slick_2.12/bundles/slick_2.12-3.3.2.jar"
-                        },
-                        {
-                            "name": "slick_2.12",
-                            "classifier": "sources",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/com.typesafe.slick/slick_2.12/srcs/slick_2.12-3.3.2-sources.jar"
-                        }
-                    ]
-                },
-                {
-                    "organization": "org.scala-lang.modules",
-                    "name": "scala-collection-compat_2.12",
-                    "version": "2.0.0",
-                    "artifacts": [
-                        {
-                            "name": "scala-collection-compat_2.12",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/org.scala-lang.modules/scala-collection-compat_2.12/bundles/scala-collection-compat_2.12-2.0.0.jar"
-                        },
-                        {
-                            "name": "scala-collection-compat_2.12",
-                            "classifier": "sources",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/org.scala-lang.modules/scala-collection-compat_2.12/srcs/scala-collection-compat_2.12-2.0.0-sources.jar"
-                        }
-                    ]
-                },
-                {
-                    "organization": "com.typesafe.slick",
-                    "name": "slick-hikaricp_2.12",
-                    "version": "3.3.2",
-                    "artifacts": [
-                        {
-                            "name": "slick-hikaricp_2.12",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/com.typesafe.slick/slick-hikaricp_2.12/bundles/slick-hikaricp_2.12-3.3.2.jar"
-                        },
-                        {
-                            "name": "slick-hikaricp_2.12",
-                            "classifier": "sources",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/com.typesafe.slick/slick-hikaricp_2.12/srcs/slick-hikaricp_2.12-3.3.2-sources.jar"
-                        }
-                    ]
-                },
-                {
-                    "organization": "com.zaxxer",
-                    "name": "HikariCP",
-                    "version": "3.2.0",
-                    "artifacts": [
-                        {
-                            "name": "HikariCP",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/com.zaxxer/HikariCP/bundles/HikariCP-3.2.0.jar"
-                        },
-                        {
-                            "name": "HikariCP",
-                            "classifier": "sources",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/com.zaxxer/HikariCP/srcs/HikariCP-3.2.0-sources.jar"
-                        }
-                    ]
-                },
-                {
-                    "organization": "com.typesafe.play",
-                    "name": "play-slick-evolutions_2.12",
-                    "version": "5.0.0",
-                    "artifacts": [
-                        {
-                            "name": "play-slick-evolutions_2.12",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/com.typesafe.play/play-slick-evolutions_2.12/jars/play-slick-evolutions_2.12-5.0.0.jar"
-                        },
-                        {
-                            "name": "play-slick-evolutions_2.12",
-                            "classifier": "sources",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/com.typesafe.play/play-slick-evolutions_2.12/srcs/play-slick-evolutions_2.12-5.0.0-sources.jar"
-                        }
-                    ]
-                },
-                {
-                    "organization": "com.typesafe.slick",
-                    "name": "slick-codegen_2.12",
-                    "version": "3.3.2",
-                    "artifacts": [
-                        {
-                            "name": "slick-codegen_2.12",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/com.typesafe.slick/slick-codegen_2.12/jars/slick-codegen_2.12-3.3.2.jar"
-                        },
-                        {
-                            "name": "slick-codegen_2.12",
-                            "classifier": "sources",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/com.typesafe.slick/slick-codegen_2.12/srcs/slick-codegen_2.12-3.3.2-sources.jar"
-                        }
-                    ]
-                },
-                {
                     "organization": "mysql",
                     "name": "mysql-connector-java",
-                    "version": "6.0.6",
+                    "version": "5.1.49",
                     "artifacts": [
                         {
                             "name": "mysql-connector-java",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/mysql/mysql-connector-java/jars/mysql-connector-java-6.0.6.jar"
+                            "path": "/Users/akimine.motomura/.ivy2/cache/mysql/mysql-connector-java/jars/mysql-connector-java-5.1.49.jar"
                         },
                         {
                             "name": "mysql-connector-java",
                             "classifier": "sources",
-                            "path": "/Users/akimine.motomura/.ivy2/cache/mysql/mysql-connector-java/srcs/mysql-connector-java-6.0.6-sources.jar"
+                            "path": "/Users/akimine.motomura/.ivy2/cache/mysql/mysql-connector-java/srcs/mysql-connector-java-5.1.49-sources.jar"
                         }
                     ]
                 }

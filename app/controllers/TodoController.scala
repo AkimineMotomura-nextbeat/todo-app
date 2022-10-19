@@ -13,6 +13,9 @@ import play.api.data.Forms._
 import play.api.data.validation.Constraints._
 
 import model.ViewValueHome
+//import lib.model.Todo
+import lib.persistence._
+
 import slick.model.Todo
 import slick.model.TodoStatus
 
@@ -26,6 +29,7 @@ case class TodoFormData(
 class TodoController @Inject()(val controllerComponents: ControllerComponents) extends BaseController with play.api.i18n.I18nSupport {
 
   var todos: Seq[Todo] = (1L to 10L).map(i => Todo(i.toString, s"test todo${i.toString}", "Test", TodoStatus.untouched, "test"))
+  //val todoRepos: TodoRepository[Todo]
 
   /**
     * GET /todo/list
@@ -33,6 +37,8 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents) e
   def todoList() = Action { implicit req =>
     //DBから全件入手して放り込む.DBが用意できていないのでこれから
     //todos = fetchTodo()
+
+    //val todos: Seq[Todo]
 
     val vv = ViewValueHome(
       title  = "Todo list",
@@ -53,6 +59,25 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents) e
       "category" -> text
     )(TodoFormData.apply)(TodoFormData.unapply)
   )
+/*
+  def view(id: Long) = Action.async { implicit req =>
+    val vv = ViewValueHome(
+      title  = "",
+      cssSrc = Seq("main.css"),
+      jsSrc  = Seq("main.js")
+    )
+
+    todoRepos.get(Todo.Id(id)).value.get.get match{
+      case Some(todo)  => {
+        val filledForm = form.fill(TodoFormData(todo, todo.content, todo.category))
+        Ok(views.html.todo.editor(todo, filledForm, vv))
+      }
+      case None        => {
+        //
+      }
+    }
+  }
+*/  
   
   def view(id: String) = Action { implicit req =>
     val vv = ViewValueHome(
@@ -128,7 +153,7 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents) e
    * 対象のデータを削除する
    */
   def delete() = Action { implicit request: Request[AnyContent] =>
-    // requestから直接値を取得するサンプル
+    // requestから直接値を取得する
     val idOpt = request.body.asFormUrlEncoded.get("id").headOption
     // idがあり、値もあるときに削除
     todos.find(_.id == idOpt.get) match {
