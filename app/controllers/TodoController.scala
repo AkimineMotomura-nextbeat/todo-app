@@ -6,6 +6,10 @@
 
 package controllers
 
+import scala.concurrent._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Success, Failure}
+
 import javax.inject._
 import play.api.mvc._
 import play.api.data._
@@ -13,11 +17,8 @@ import play.api.data.Forms._
 import play.api.data.validation.Constraints._
 
 import model.ViewValueHome
-//import lib.model.Todo
+import lib.model.Todo
 import lib.persistence._
-
-import slick.model.Todo
-import slick.model.TodoStatus
 
 case class TodoFormData(
   title: String,
@@ -26,27 +27,35 @@ case class TodoFormData(
 )
 
 @Singleton
-class TodoController @Inject()(val controllerComponents: ControllerComponents) extends BaseController with play.api.i18n.I18nSupport {
+class TodoController @Inject()(val controllerComponents: ControllerComponents, todoRepos: TodoRepository[slick.jdbc.JdbcProfile]) //TodoRepository <- 違う書き方がありそう
+    extends BaseController with play.api.i18n.I18nSupport {
 
-  var todos: Seq[Todo] = (1L to 10L).map(i => Todo(i, s"test todo${i.toString}", "Test", TodoStatus.untouched, "test"))
-  //val todoRepos: TodoRepository[Todo]
+  //val todoRepos = new TodoRepository[lib.persistence.onMySQL.driver] //reposの宣言方法調べておく
 
   /**
     * GET /todo/list
     */
   def todoList() = Action { implicit req =>
-    //DBから全件入手して放り込む.DBが用意できていないのでこれから
-    //todos = fetchTodo()
-
-    //val todos: Seq[Todo]
-
     val vv = ViewValueHome(
       title  = "Todo list",
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
     )
 
-    Ok(views.html.todo.list(todos, vv))
+    todoRepos.all onComplete {
+      case Success(todos) => {
+        //seqが空の時の処理を書く
+
+        Ok(views.html.todo.list(todos.map(_.v), vv))
+      }
+      case Failure(_)        => {
+        println("ERROR: TodoController.scala TodoController.todoList")
+        NotFound(views.html.error.page404()) //404を仮置き
+      }
+    }
+
+    //??? 上のUnitからrequestが生成できない分岐があるらしい？
+    NotFound(views.html.error.page404())
   }
 
   /**
@@ -59,25 +68,6 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents) e
       "category" -> text
     )(TodoFormData.apply)(TodoFormData.unapply)
   )
-/*
-  def edit(id: Long) = Action.async { implicit req =>
-    val vv = ViewValueHome(
-      title  = "",
-      cssSrc = Seq("main.css"),
-      jsSrc  = Seq("main.js")
-    )
-
-    todoRepos.get(Todo.Id(id)).value.get.get match{
-      case Some(todo)  => {
-        val filledForm = form.fill(TodoFormData(todo, todo.content, todo.category))
-        Ok(views.html.todo.editor(todo, filledForm, vv))
-      }
-      case None        => {
-        //
-      }
-    }
-  }
-*/  
   
   def edit(id: Long) = Action { implicit req =>
     val vv = ViewValueHome(
@@ -85,17 +75,22 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents) e
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
     )
-    //DBを叩く
-    //fetch(id)
-    
-    //DBが無いので動作確認用
-    todos.find(_.id == id) match{
-      case Some(todo) => {
-        val filledForm = form.fill(TodoFormData(todo.title, todo.content, todo.category))
-        Ok(views.html.todo.editor(todo.id, filledForm, vv))
+
+    todoRepos.get(Todo.Id(id)) onComplete {
+      case Success(todo_option)  => {
+        todo_option match {
+          case Some(todo)   => {
+            val filledForm = form.fill(TodoFormData(todo.v.title, todo.v.content, todo.v.category))
+            Ok(views.html.todo.editor(todo.id, filledForm, vv))
+          }
+          case None         => NotFound(views.html.error.page404())
+        }
       }
-      case None        => NotFound(views.html.error.page404())
+      case Failure(_)     => NotFound(views.html.error.page404())
     }
+
+    //??? 上のUnitからrequestが生成できない分岐があるらしい？
+    NotFound(views.html.error.page404())
   }
 
   /**
@@ -123,24 +118,27 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents) e
           cssSrc = Seq("main.css"),
           jsSrc  = Seq("main.js")
         )
-        
-        todos.find(_.id == id) match{
-          case Some(todo) => BadRequest(views.html.todo.editor(todo.id, form, vv)) //form <- formWithErrorに修正
-          case None        => NotFound(views.html.error.page404())
-        }
+        //BadRequestを送り返すようにする
+        Redirect("/todo/list")
       },
 
       // 処理が成功した場合に呼び出される関数
       (todoFormData: TodoFormData) => {
-        val todo = Todo(id, todoFormData.title, todoFormData.content, TodoStatus.untouched, todoFormData.category)
-          todos.find(_.id == id) match{
-            case Some(todo_pre) => {
-              todos = todos.updated(todos.indexOf(todo_pre), todo)
-
-              Redirect("/todo/list")
+        //DBのデータをupdate
+        todoRepos.get(Todo.Id(id)) onComplete {
+          case Success(todo_option)  => {
+            todo_option match {
+              case Some(todo)   => {
+                val todo_udpated = todo.map(_.copy(title=todoFormData.title, content=todoFormData.content, category=todoFormData.category))
+                todoRepos.update(todo_udpated)  //成否判定が必要?
+              }
+              case None         => NotFound(views.html.error.page404())
             }
-            case None        => NotFound(views.html.error.page404())
           }
+          case Failure(_)     => NotFound(views.html.error.page404())
+        }
+
+        Redirect("/todo/list")
       }
     )
   }
@@ -163,10 +161,9 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents) e
 
       // 処理が成功した場合に呼び出される関数
       (todoFormData: TodoFormData) => {
-        //id生成. 下記は仮
-        val todo_id = (todos.length + 1)
-        val todo = Todo(todo_id, todoFormData.title, todoFormData.content, TodoStatus.untouched, todoFormData.category)
-        todos = todos :+ todo
+        //DBに追加
+        val todo_new = Todo.build(todoFormData.title, todoFormData.content, todoFormData.category)
+        todoRepos.add(todo_new)
 
         Redirect("/todo/list")
       }
@@ -178,15 +175,17 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents) e
    */
   def delete() = Action { implicit request: Request[AnyContent] =>
     // requestから直接値を取得する
-    val idOpt = request.body.asFormUrlEncoded.get("id").headOption
-    // idがあり、値もあるときに削除
-    todos.find(_.id.toString == idOpt.get) match {
-      case Some(todo) =>
-        todos = todos.filterNot(_.id.toString == idOpt.get)
-        // 削除が完了したら一覧ページへリダイレクト
+    request.body.asFormUrlEncoded.get("id").headOption match {
+      case Some(id_str)  => {
+        import scala.util.control.Exception._
+        catching(classOf[NumberFormatException]) opt id_str.toLong match {
+          case Some(id) => todoRepos.remove(Todo.Id(id)) //<- DBの成否判定が必要?
+          case None     => BadRequest("/todo/list")
+        }
+
         Redirect(routes.TodoController.todoList())
-      case None        =>
-        NotFound(views.html.error.page404())
+      }
+      case None      => BadRequest("/todo/list")
     }
   }
 }

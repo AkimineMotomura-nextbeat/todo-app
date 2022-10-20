@@ -17,6 +17,11 @@ case class TodoRepository[P <: JdbcProfile]()(implicit val driver: P)
       .result.headOption
     }
 
+  def all(): Future[Seq[EntityEmbeddedId]] = 
+    RunDBAction(TodoTable, "slave") {
+      _.result
+    }
+
   def add(entity: EntityWithNoId): Future[Id] =
     RunDBAction(TodoTable) { slick =>
       slick returning slick.map(_.id) += entity.v

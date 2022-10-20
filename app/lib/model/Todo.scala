@@ -43,12 +43,12 @@ object Todo {
         )
     }
 
-    def build(title: String): Todo#WithNoId =
+    def build(title: String, content: String, category: String): Todo#WithNoId =
         new Todo(
             id = None,
             title = title,
-            content = "",
+            content = content,
             state = Status.UNTOUCHED, 
-            category = ""
+            category = category
         ).toWithNoId
 }

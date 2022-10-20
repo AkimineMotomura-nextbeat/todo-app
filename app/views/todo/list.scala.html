@@ -2,8 +2,9 @@
 * todo一覧のページ
 *@
 
+@import lib.model.Todo
 @import helper._
-@(todos: Seq[slick.model.Todo], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+@(todos: Seq[Todo], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @common.Default(vv){
 <a href="http://localhost:9000/todo/new">新規作成</a>
