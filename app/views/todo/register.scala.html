@@ -4,11 +4,11 @@
 
 @import helper._
 @import controllers.TodoFormData
-@(id: Long, form: Form[TodoFormData], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+@(form: Form[TodoFormData], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @common.Default(vv){
-    <h2>編集画面</h2>
-    @helper.form(action = routes.TodoController.update(id)) {
+    <h2>新規登録</h2>
+    @helper.form(action = routes.TodoController.store()) {
         @helper.CSRF.formField
         @helper.inputText(form("title"))
         @helper.textarea(form("content"), 'rows -> 7, 'cols -> 40)

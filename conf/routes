@@ -4,15 +4,19 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                             controllers.HomeController.index
+GET     /                                 controllers.HomeController.index
 # 一覧ページ
-GET     /todo/list                      controllers.TodoController.todoList
-#　詳細ページ
-GET     /todo/$id<(new|[0-9]+)>         controllers.TodoController.view(id: String)
+GET     /todo/list                        controllers.TodoController.todoList
+#新規作成ページ
+GET     /todo/new                         controllers.TodoController.register
+#　編集ページ
+GET     /todo/$id<[0-9]+>                 controllers.TodoController.edit(id: Long)
+#新規作成のPOST先
+POST    /todo/new                         controllers.TodoController.store
 # 編集後のPOST先
-POST    /todo/$id<(new|[0-9]+)>         controllers.TodoController.store(id: String)
+POST    /todo/$id<[0-9]+>                 controllers.TodoController.update(id: Long)
 # DELETE
-POST    /todo/delete             controllers.TodoController.delete()
+POST    /todo/delete                      controllers.TodoController.delete
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

@@ -14,7 +14,7 @@ object TodoStatus{
  * todoのモデル
  */
 case class Todo(
-  id: String,
+  id: Long,
   title:  String,
   content: String,
   status: TodoStatus,
