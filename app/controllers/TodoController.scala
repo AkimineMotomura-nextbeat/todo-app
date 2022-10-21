@@ -9,6 +9,7 @@ package controllers
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Success, Failure}
+import scala.concurrent.duration._
 
 import javax.inject._
 import play.api.mvc._
@@ -23,14 +24,14 @@ import lib.persistence._
 case class TodoFormData(
   title: String,
   content: String,
-  category: String
+  category: Long
 )
 
 @Singleton
-class TodoController @Inject()(val controllerComponents: ControllerComponents, todoRepos: TodoRepository[slick.jdbc.JdbcProfile]) //TodoRepository <- 違う書き方がありそう
+class TodoController @Inject()(val controllerComponents: ControllerComponents/*, todoRepos: TodoRepository[slick.jdbc.JdbcProfile]*/) //TodoRepository <- constructorが見つからない???
     extends BaseController with play.api.i18n.I18nSupport {
 
-  //val todoRepos = new TodoRepository[lib.persistence.onMySQL.driver] //reposの宣言方法調べておく
+  val todoRepos = new TodoRepository[slick.jdbc.JdbcProfile]()(onMySQL.driver)
 
   /**
     * GET /todo/list
@@ -42,20 +43,25 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents, t
       jsSrc  = Seq("main.js")
     )
 
-    todoRepos.all onComplete {
-      case Success(todos) => {
+    val todos_rtv = Await.ready(todoRepos.all, Duration.Inf)
+    todos_rtv.value.get match {
+      case Success(todos)  => {
         //seqが空の時の処理を書く
 
         Ok(views.html.todo.list(todos.map(_.v), vv))
       }
       case Failure(_)        => {
-        println("ERROR: TodoController.scala TodoController.todoList")
+        println("ERROR: TodoController.scala TodoController.todoList") //デバッグ用
         NotFound(views.html.error.page404()) //404を仮置き
       }
     }
 
-    //??? 上のUnitからrequestが生成できない分岐があるらしい？
-    NotFound(views.html.error.page404())
+    /*
+    async
+    for {
+      todos <- todoRepos.all
+    } yield Ok(views.html.todo.list(todos.map(_.v), vv))
+    */
   }
 
   /**
@@ -65,7 +71,7 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents, t
     mapping(
       "title" -> nonEmptyText,
       "content" -> text,
-      "category" -> text
+      "category" -> longNumber
     )(TodoFormData.apply)(TodoFormData.unapply)
   )
   

@@ -8,10 +8,10 @@ import java.time.LocalDateTime
 import Todo._
 case class Todo(
     id:         Option[Id],
+    category:   Long,
     title:      String,
     content:    String,
     state:      Status,
-    category:   String,
     updatedAt:  LocalDateTime = NOW,
     createdAt:  LocalDateTime = NOW
 ) extends EntityModel[Id]
@@ -31,7 +31,7 @@ object Todo {
         case object COMPLETE extends Status(code = 100, name = "complete")
     }
 
-    def apply(title: String, content: String, state: Status, category: String): WithNoId = {
+    def apply(title: String, content: String, state: Status, category: Long): WithNoId = {
         new Entity.WithNoId(
             new Todo(
                 id = None,
@@ -43,7 +43,7 @@ object Todo {
         )
     }
 
-    def build(title: String, content: String, category: String): Todo#WithNoId =
+    def build(title: String, content: String, category: Long): Todo#WithNoId =
         new Todo(
             id = None,
             title = title,
