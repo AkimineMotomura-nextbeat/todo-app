@@ -28,22 +28,22 @@ object Todo {
     object Status extends EnumStatus.Of[Status] {
         case object UNTOUCHED extends Status(code = 0, name = "untouched")
         case object TOUCHED extends Status(code = 1, name = "touched")
-        case object COMPLETE extends Status(code = 100, name = "complete")
+        case object COMPLETE extends Status(code = 2, name = "complete")
     }
 
-    def apply(title: String, content: String, state: Status, category: Long): WithNoId = {
+    def apply(title: String, content: String, category: Long): WithNoId = {
         new Entity.WithNoId(
             new Todo(
                 id = None,
                 title = title,
                 content = content,
-                state = state,
+                state = Status.UNTOUCHED,
                 category = category
             )
         )
     }
 
-    def build(title: String, content: String, category: Long): Todo#WithNoId =
+    def build(id: Id, title: String, content: String, category: Long): Todo#WithNoId =
         new Todo(
             id = None,
             title = title,
