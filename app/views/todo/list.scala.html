@@ -15,7 +15,10 @@
         *@
         <li><div>
             <a href="http://localhost:9000/todo/@todo.id">
-                @todo.title
+                <div class="todoPanel">
+                    <p>@todo.title</p>
+                    <p>@todo.content</p>
+                </div>
             </a>
             @helper.form(action = routes.TodoController.delete()){
             @helper.CSRF.formField

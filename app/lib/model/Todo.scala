@@ -42,13 +42,4 @@ object Todo {
             )
         )
     }
-
-    def build(id: Id, title: String, content: String, category: Long): Todo#WithNoId =
-        new Todo(
-            id = None,
-            title = title,
-            content = content,
-            state = Status.UNTOUCHED, 
-            category = category
-        ).toWithNoId
 }

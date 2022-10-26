@@ -4,15 +4,27 @@
 
 @import helper._
 @import controllers.TodoFormData
-@(id: Long, form: Form[TodoFormData], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+@import lib.model.Category
+@(id: Long, form: Form[TodoFormData], categorys: Seq[Category], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @common.Default(vv){
     <h2>編集画面</h2>
     @helper.form(action = routes.TodoController.update(id)) {
-        @helper.CSRF.formField
-        @helper.inputText(form("title"))
-        @helper.textarea(form("content"), 'rows -> 7, 'cols -> 40)
-        @helper.inputText(form("category"))
+        @CSRF.formField
+        @inputText(form("title"))
+        @textarea(form("content"), 'rows -> 7, 'cols -> 40)
+        @select(
+            field = form("state"), 
+            options = Seq(
+                "0" -> "未着手", 
+                "1" -> "進行中",
+                "2" -> "完了"
+            )
+        )
+        @select(
+            field = form("category"),
+            options = categorys.map(category => category.id.get.toString -> category.name)
+        )
         <input type="submit" value="登録">
     }
 }

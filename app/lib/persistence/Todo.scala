@@ -2,8 +2,9 @@ package lib.persistence
 
 import scala.concurrent.Future
 import ixias.persistence.SlickRepository
-import lib.model.Todo
 import slick.jdbc.JdbcProfile
+
+import lib.model.Todo
 
 case class TodoRepository[P <: JdbcProfile]()(implicit val driver: P)
   extends SlickRepository[Todo.Id, Todo, P]

@@ -4,7 +4,8 @@
 
 @import helper._
 @import controllers.TodoFormData
-@(form: Form[TodoFormData], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+@import lib.model.Category
+@(form: Form[TodoFormData], categorys: Seq[Category], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @common.Default(vv){
     <h2>新規登録</h2>
@@ -12,7 +13,11 @@
         @helper.CSRF.formField
         @helper.inputText(form("title"))
         @helper.textarea(form("content"), 'rows -> 7, 'cols -> 40)
-        @helper.inputText(form("category"))
+        @helper.select(
+            field = form("category"),
+            options = categorys.map(category => category.id.get.toString -> category.name),
+            '_default -> "choose one"
+        )
         <input type="submit" value="登録">
     }
 }
