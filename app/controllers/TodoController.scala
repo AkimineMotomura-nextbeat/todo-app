@@ -48,8 +48,8 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents/*,
     
     for {
       todos <- todoRepos.all
-    } yield Ok(views.html.todo.list(todos.map(_.v), vv))
-    
+      categorys <- categoryRepos.all
+    } yield Ok(views.html.todo.list(todos.map(_.v), categorys.map(_.v), vv))
   }
 
   /**
@@ -123,20 +123,22 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents/*,
       (todoFormData: TodoFormData) => {
         //DBのデータをupdate
         //コーナーケースの抜けができているかも?
-        val todo_old = Await.ready(todoRepos.get(Todo.Id(id)), Duration.Inf) 
 
+        //変更前のtodoを入手
+        val todo_old = Await.ready(todoRepos.get(Todo.Id(id)), Duration.Inf) 
         todo_old onComplete {
-          case Success(_) => println(todoFormData.category)
+          case Success(_) => println(todoFormData.category) //debug
           case Failure(_) => throw new java.io.IOException("Failed to fetch a data from DB")
         }
 
+        //todoFormDataから変更情報をコピーしてDB更新
         todo_old.value.get.get match {
           case Some(todo) => {
             for {
               response <- todoRepos.update(todo.map(_.copy( title=todoFormData.title, 
                                                             content=todoFormData.content, 
-                                                            category=todoFormData.category/*, 
-                                                            state=Status.apply(todoFormData.state.toShort)*/))) // degub
+                                                            category=todoFormData.category, 
+                                                            state=Todo.Status.apply(todoFormData.state.toShort))))
             } yield {
               response match {
                 case None     => NotFound(views.html.error.page404())
@@ -176,7 +178,7 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents/*,
       // 処理が成功した場合に呼び出される関数
       (todoFormData: TodoFormData) => {
         //DBに追加
-        val todo_new = Todo.apply(todoFormData.title, todoFormData.content, 0) //debug
+        val todo_new = Todo.apply(todoFormData.title, todoFormData.content, category=todoFormData.category) //debug
         Await.ready(todoRepos.add(todo_new), Duration.Inf)
 
         Future.successful(Redirect("/todo/list"))

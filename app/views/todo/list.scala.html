@@ -3,8 +3,9 @@
 *@
 
 @import lib.model.Todo
+@import lib.model.Category
 @import helper._
-@(todos: Seq[Todo], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+@(todos: Seq[Todo], categorys: Seq[Category], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @common.Default(vv){
 <a href="http://localhost:9000/todo/new">新規作成</a>
@@ -16,8 +17,16 @@
         <li><div>
             <a href="http://localhost:9000/todo/@todo.id">
                 <div class="todoPanel">
-                    <p>@todo.title</p>
+                    <h3>@todo.title</h3>
                     <p>@todo.content</p>
+                    <p>@categorys.find(_.id.get == todo.category).get.name</p> @* <- コーナーケースがありそうな危うさ *@
+                    <p>
+                        @(todo.state.code match {
+                            case 0 => "TODO(着手前)"
+                            case 1 => "進行中"
+                            case 2 => "完了"
+                         })
+                    </p>
                 </div>
             </a>
             @helper.form(action = routes.TodoController.delete()){
