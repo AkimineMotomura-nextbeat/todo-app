@@ -5,6 +5,8 @@
 
 # An example controller showing a sample home page
 GET     /                                 controllers.HomeController.index
+
+## Todo
 # 一覧ページ
 GET     /todo/list                        controllers.TodoController.todoList
 #新規作成ページ
@@ -17,6 +19,20 @@ POST    /todo/new                         controllers.TodoController.store
 POST    /todo/$id<[0-9]+>                 controllers.TodoController.update(id: Long)
 # DELETE
 POST    /todo/delete                      controllers.TodoController.delete
+
+##Category
+#一覧ページ
+GET     /todo/category/list               controllers.CategoryController.list
+#新規作成ページ
+GET     /todo/category/new                controllers.CategoryController.register
+#　編集ページ
+GET     /todo/category/$id<[0-9]+>        controllers.CategoryController.edit(id: Long)
+#新規作成のPOST先
+POST    /todo/category/new                controllers.CategoryController.store
+# 編集後のPOST先
+POST    /todo/category/$id<[0-9]+>        controllers.CategoryController.update(id: Long)
+# DELETE
+POST    /todo/category/delete             controllers.CategoryController.delete
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

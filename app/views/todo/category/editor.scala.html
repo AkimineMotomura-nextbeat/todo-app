@@ -1,0 +1,26 @@
+@*
+* categoryの詳細を表示, 編集するページ
+*@
+
+@import helper._
+@import controllers.CategoryFormData
+@import lib.model.Category
+@(id: Long, categorys: Seq[Category], form: Form[CategoryFormData], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+
+@common.Default(vv){
+    <h2>編集画面</h2>
+    @helper.form(action = routes.CategoryController.update(id)) {
+        @CSRF.formField
+        @inputText(form("name"))
+        @inputText(form("slug"))
+        @select(
+            field = form("color"), 
+            options = Seq(
+                "0" -> "color1", 
+                "1" -> "color2",
+                "2" -> "color3"
+            )
+        )
+        <input type="submit" value="登録">
+    }
+}

@@ -18,38 +18,34 @@ import play.api.data.Forms._
 import play.api.data.validation.Constraints._
 
 import model.ViewValueHome
-import lib.model.Todo
 import lib.model.Category
 import lib.persistence._
 
-case class TodoFormData(
-  title: String,
-  content: String,
-  category: Long, 
-  state: Int
+case class CategoryFormData(
+  name: String,
+  slug: String,
+  color: Int
 )
 
 @Singleton
-class TodoController @Inject()(val controllerComponents: ControllerComponents/*, todoRepos: TodoRepository[slick.jdbc.JdbcProfile]*/) //TodoRepository <- constructorが見つからない???
+class CategoryController @Inject()(val controllerComponents: ControllerComponents/*, todoRepos: TodoRepository[slick.jdbc.JdbcProfile]*/) //TodoRepository <- constructorが見つからない???
     extends BaseController with play.api.i18n.I18nSupport {
 
-  val todoRepos = new TodoRepository[slick.jdbc.JdbcProfile]()(onMySQL.driver)
   val categoryRepos = new CategoryRepository[slick.jdbc.JdbcProfile]()(onMySQL.driver)
 
   /**
     * GET /todo/list
     */
-  def todoList() = Action async { implicit req =>
+  def list() = Action async { implicit req =>
     val vv = ViewValueHome(
-      title  = "Todo list",
+      title  = "Category list",
       cssSrc = Seq("main.css", "list.css"),
       jsSrc  = Seq("main.js")
     )
     
     for {
-      todos <- todoRepos.all
       categorys <- categoryRepos.all
-    } yield Ok(views.html.todo.list(todos.map(_.v), categorys.map(_.v), vv))
+    } yield Ok(views.html.todo.category.list(categorys.map(_.v), vv))
   }
 
   /**
@@ -57,11 +53,10 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents/*,
     */
   val form = Form(
     mapping(
-      "title" -> nonEmptyText,
-      "content" -> text,
-      "category" -> longNumber,
-      "state" -> number.verifying(min(0), max(2))
-    )(TodoFormData.apply)(TodoFormData.unapply)
+      "name" -> nonEmptyText,
+      "slug" -> nonEmptyText, //英字のみの指定が必要
+      "color" -> number.verifying(min(0), max(255))
+    )(CategoryFormData.apply)(CategoryFormData.unapply)
   )
   
   def edit(id: Long) = Action async { implicit req =>
@@ -72,13 +67,13 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents/*,
     )
 
     for {
-      todo_opt <- todoRepos.get(Todo.Id(id))
+      category_opt <- categoryRepos.get(Category.Id(id))
       category_seq <- categoryRepos.all
     }yield {
-      todo_opt match {
-        case Some(todo) => {
-          val filledForm = form.fill(TodoFormData(todo.v.title, todo.v.content, todo.v.category, todo.v.state.code))
-          Ok(views.html.todo.editor(todo.id, filledForm, category_seq.map(_.v), vv))
+      category_opt match {
+        case Some(category) => {
+          val filledForm = form.fill(CategoryFormData(category.v.name, category.v.slug, category.v.color))
+          Ok(views.html.todo.category.editor(category.id, category_seq.map(_.v), filledForm, vv))
         }
         case None       => NotFound(views.html.error.page404())
       }
@@ -94,11 +89,11 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents/*,
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
     )
+
     for {
-      categorys <- categoryRepos.all
+        category_seq <- categoryRepos.all
     } yield {
-      val initForm = form.fill(TodoFormData("", "", 0, 0))
-      Ok(views.html.todo.register(initForm, categorys.map(_.v), vv))
+        Ok(views.html.todo.category.register(category_seq.map(_.v), form, vv))
     }
   }
 
@@ -109,41 +104,43 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents/*,
     form.bindFromRequest().fold(
       // 処理が失敗した場合に呼び出される関数
       // 処理失敗の例: バリデーションエラー
-      (formWithErrors: Form[TodoFormData]) => {
+      (formWithErrors: Form[CategoryFormData]) => {
         val vv = ViewValueHome(
           title  = "",
           cssSrc = Seq("main.css"),
           jsSrc  = Seq("main.js")
         )
         
-        val d: Seq[Category] = Seq[Category]() //仮置き
-        Future.successful(BadRequest(views.html.todo.editor(id, formWithErrors, d, vv)))
+        for {
+            category_seq <- categoryRepos.all
+        } yield {
+            BadRequest(views.html.todo.category.editor(id, category_seq.map(_.v), formWithErrors, vv))
+        }
       },
 
       // 処理が成功した場合に呼び出される関数
-      (todoFormData: TodoFormData) => {
+      (categoryFormData: CategoryFormData) => {
         //DBのデータをupdate
         //コーナーケースの抜けができているかも?
 
         //変更前のtodoを入手
-        val todo_old = Await.ready(todoRepos.get(Todo.Id(id)), Duration.Inf) 
-        todo_old onComplete {
-          case Success(_) => println(todoFormData.category) //debug
+        val category_old = Await.ready(categoryRepos.get(Category.Id(id)), Duration.Inf) 
+        category_old onComplete {
+          case Success(_) => println(categoryFormData.name) //debug
           case Failure(_) => throw new java.io.IOException("Failed to fetch a data from DB")
         }
 
         //todoFormDataから変更情報をコピーしてDB更新
-        todo_old.value.get.get match {
+        category_old.value.get.get match {
           case Some(todo) => {
             for {
-              response <- todoRepos.update(todo.map(_.copy( title=todoFormData.title, 
-                                                            content=todoFormData.content, 
-                                                            category=todoFormData.category, 
-                                                            state=Todo.Status.apply(todoFormData.state.toShort))))
+              response <- categoryRepos.update(todo.map(_.copy( name=categoryFormData.name, 
+                                                            slug=categoryFormData.slug, 
+                                                            color=categoryFormData.color.toShort)))
             } yield {
               response match {
                 case None     => NotFound(views.html.error.page404())
-                case Some(_)  => Redirect("/todo/list")
+                case Some(_)  => Redirect("/todo/category/list")
               }
             }
           }
@@ -162,7 +159,7 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents/*,
     form.bindFromRequest().fold(
       // 処理が失敗した場合に呼び出される関数
       // 処理失敗の例: バリデーションエラー
-      (formWithErrors: Form[TodoFormData]) => {
+      (formWithErrors: Form[CategoryFormData]) => {
         val vv = ViewValueHome(
           title  = "",
           cssSrc = Seq("main.css"),
@@ -172,17 +169,17 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents/*,
         for {
           categorys <- categoryRepos.all
         } yield {
-          BadRequest(views.html.todo.register(formWithErrors, categorys.map(_.v), vv))
+          BadRequest(views.html.todo.category.register(categorys.map(_.v), formWithErrors, vv))
         }
       },
 
       // 処理が成功した場合に呼び出される関数
-      (todoFormData: TodoFormData) => {
+      (categoryFormData: CategoryFormData) => {
         //DBに追加
-        val todo_new = Todo.apply(todoFormData.title, todoFormData.content, category=todoFormData.category)
-        Await.ready(todoRepos.add(todo_new), Duration.Inf)
+        val category_new = Category.apply(categoryFormData.name, categoryFormData.slug, color=categoryFormData.color.toShort)
+        Await.ready(categoryRepos.add(category_new), Duration.Inf)
 
-        Future.successful(Redirect("/todo/list"))
+        Future.successful(Redirect("/todo/category/list"))
       }
     )
   }
@@ -196,13 +193,13 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents/*,
       case Some(id_str)  => {
         import scala.util.control.Exception._
         catching(classOf[NumberFormatException]) opt id_str.toLong match {
-          case Some(id) => Await.ready(todoRepos.remove(Todo.Id(id)), Duration.Inf) //<- DBの成否判定が必要?
-          case None     => BadRequest("/todo/list")
+          case Some(id) => Await.ready(categoryRepos.remove(Category.Id(id)), Duration.Inf) //<- DBの成否判定が必要?
+          case None     => BadRequest("/todo/category/list")
         }
 
-        Redirect(routes.TodoController.todoList())
+        Redirect("/todo/category/list")
       }
-      case None      => BadRequest("/todo/list")
+      case None      => BadRequest("/todo/category/list")
     }
   }
 }

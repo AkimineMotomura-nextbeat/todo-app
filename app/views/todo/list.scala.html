@@ -8,31 +8,34 @@
 @(todos: Seq[Todo], categorys: Seq[Category], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @common.Default(vv){
-<a href="http://localhost:9000/todo/new">新規作成</a>
-<ul>
+<a href="/todo/new">新規作成</a>
+<a href="/todo/category/list">カテゴリー</a>
+<ul id="todo_list">
     @for(todo <- todos){
         @*
         *どう表示するかは後で考える
         *@
         <li><div>
-            <a href="http://localhost:9000/todo/@todo.id">
+            <a href="/todo/@todo.id">
                 <div class="todoPanel">
                     <h3>@todo.title</h3>
                     <p>@todo.content</p>
-                    <p>@categorys.find(_.id.get == todo.category).get.name</p> @* <- コーナーケースがありそうな危うさ *@
-                    <p>
-                        @(todo.state.code match {
-                            case 0 => "TODO(着手前)"
-                            case 1 => "進行中"
-                            case 2 => "完了"
-                         })
-                    </p>
+                    <div>
+                        <p>@categorys.find(_.id.get == todo.category).get.name</p> @* <- コーナーケースがありそうな危うさ *@
+                        <p>
+                            @(todo.state.code match {
+                                case 0 => "TODO(着手前)"
+                                case 1 => "進行中"
+                                case 2 => "完了"
+                             })
+                        </p>
+                        @helper.form(action = routes.TodoController.delete()){
+                        @helper.CSRF.formField
+                        <input type="hidden" value="@todo.id" name="id">
+                        <input type="submit" value="削除">
+                    </div>
                 </div>
             </a>
-            @helper.form(action = routes.TodoController.delete()){
-            @helper.CSRF.formField
-            <input type="hidden" value="@todo.id" name="id">
-            <input type="submit" value="削除">
         </div></li>
         }
     }

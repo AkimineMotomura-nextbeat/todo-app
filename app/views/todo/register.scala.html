@@ -18,6 +18,7 @@
             options = categorys.map(category => category.id.get.toString -> category.name),
             '_default -> "choose one"
         )
+        @inputText(form("state"), 'class -> "info", '_label -> "")
         <input type="submit" value="登録">
     }
 }
