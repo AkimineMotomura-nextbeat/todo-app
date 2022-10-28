@@ -15,6 +15,7 @@ import javax.inject._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
+import play.api.data.validation._
 import play.api.data.validation.Constraints._
 
 import model.ViewValueHome
@@ -55,7 +56,7 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
   val form = Form(
     mapping(
       "name" -> nonEmptyText,
-      "slug" -> nonEmptyText, //英字のみの指定が必要
+      "slug" -> nonEmptyText.verifying(Constraints.pattern("[0-9a-zA-Z]+".r)), 
       "color" -> number.verifying(min(0), max(255))
     )(CategoryFormData.apply)(CategoryFormData.unapply)
   )
