@@ -31,6 +31,7 @@ case class CategoryFormData(
 class CategoryController @Inject()(val controllerComponents: ControllerComponents/*, todoRepos: TodoRepository[slick.jdbc.JdbcProfile]*/) //TodoRepository <- constructorが見つからない???
     extends BaseController with play.api.i18n.I18nSupport {
 
+  val todoRepos = new TodoRepository[slick.jdbc.JdbcProfile]()(onMySQL.driver)
   val categoryRepos = new CategoryRepository[slick.jdbc.JdbcProfile]()(onMySQL.driver)
 
   /**
@@ -187,19 +188,30 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
   /**
    * 対象のデータを削除する
    */
-  def delete() = Action { implicit request: Request[AnyContent] =>
+  def delete() = Action async { implicit request: Request[AnyContent] =>
     // requestから直接値を取得する
     request.body.asFormUrlEncoded.get("id").headOption match {
       case Some(id_str)  => {
         import scala.util.control.Exception._
         catching(classOf[NumberFormatException]) opt id_str.toLong match {
-          case Some(id) => Await.ready(categoryRepos.remove(Category.Id(id)), Duration.Inf) //<- DBの成否判定が必要?
-          case None     => BadRequest("/todo/category/list")
+          case Some(id) => {
+            Await.ready(categoryRepos.remove(Category.Id(id)), Duration.Inf) //<- DBの成否判定が必要?
+            
+            //CategoryControllerでtodoTable操作してしまってるのが良く無いかも
+            for {
+              todo_list <- todoRepos.all
+            } yield {
+              for (todo <- todo_list if todo.v.category == id) {
+                todoRepos.update(todo.map(_.copy(category=6))) //category(6): noCateogry
+              }
+            
+              Redirect("/todo/category/list")
+            }
+          }
+          case None     => Future.successful(BadRequest("/todo/category/list"))
         }
-
-        Redirect("/todo/category/list")
       }
-      case None      => BadRequest("/todo/category/list")
+      case None      => Future.successful(BadRequest("/todo/category/list"))
     }
   }
 }

@@ -7,16 +7,17 @@
 @(categorys: Seq[Category], colors: Seq[String], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @common.Default(vv){
-<a href="http://localhost:9000/todo/category/new">新規作成</a>
+<a href="/todo/list" class="link_button">戻る</a>
+<a href="/todo/category/new" class="link_button">新規作成</a>
 <ul id="todo_list">
-    @for(category <- categorys){
+    @for(category <- categorys if category.id.get != 6){
         <li><div class="todoPanel" style="background-color: @(colors(category.color))">
             <a href="http://localhost:9000/todo/category/@category.id">
                 <div>
                     <h3>@category.name</h3>
                     <p>@category.slug</p>
                     <p>@category.color</p>
-                    @helper.form(action = routes.TodoController.delete()){
+                    @helper.form(action = routes.CategoryController.delete()){
                     @helper.CSRF.formField
                     <input type="hidden" value="@category.id" name="id">
                     <input type="submit" value="削除">
