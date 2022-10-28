@@ -9,9 +9,17 @@ ul#todo_list{
     padding: 10px;
     background-color: #eee;
     width: 200px;
+    border-radius: 10px;
 }
 
 .todoPanel a {
     text-decoration: none;
+    color: black;
+}
+
+.link_button {
+    padding: 10px;
+    text-decoration: none;
+    background-color: blanchedalmond;
     color: black;
 }

@@ -5,19 +5,19 @@
 @import lib.model.Todo
 @import lib.model.Category
 @import helper._
-@(todos: Seq[Todo], categorys: Seq[Category], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+@(todos: Seq[Todo], categorys: Seq[Category], colors: Seq[String], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @common.Default(vv){
-<a href="/todo/new">新規作成</a>
-<a href="/todo/category/list">カテゴリー</a>
+<a href="/todo/new" class="link_button">新規作成</a>
+<a href="/todo/category/list" class="link_button">カテゴリー</a>
 <ul id="todo_list">
     @for(todo <- todos){
         @*
         *どう表示するかは後で考える
         *@
-        <li><div>
+        <li><div class="todoPanel" style="background-color: @(colors(categorys.find(_.id.get == todo.category).get.color))">
             <a href="/todo/@todo.id">
-                <div class="todoPanel">
+                <div>
                     <h3>@todo.title</h3>
                     <p>@todo.content</p>
                     <div>

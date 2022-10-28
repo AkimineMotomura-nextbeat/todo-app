@@ -45,7 +45,7 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
     
     for {
       categorys <- categoryRepos.all
-    } yield Ok(views.html.todo.category.list(categorys.map(_.v), vv))
+    } yield Ok(views.html.todo.category.list(categorys.map(_.v), Category.colors, vv))
   }
 
   /**

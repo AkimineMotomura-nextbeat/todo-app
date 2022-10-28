@@ -20,6 +20,8 @@ object Category {
     type WithNoId = Entity.WithNoId[Id, Category]
     type EmbeddedId = Entity.EmbeddedId[Id, Category]
 
+    val colors: Seq[String] = Seq("Gray", "royalblue", "tomato", "seagreen")
+
     def apply(name: String, slug: String, color: Short): WithNoId = {
         new Entity.WithNoId(
             new Category(

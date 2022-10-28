@@ -49,7 +49,7 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents/*,
     for {
       todos <- todoRepos.all
       categorys <- categoryRepos.all
-    } yield Ok(views.html.todo.list(todos.map(_.v), categorys.map(_.v), vv))
+    } yield Ok(views.html.todo.list(todos.map(_.v), categorys.map(_.v), Category.colors, vv))
   }
 
   /**
