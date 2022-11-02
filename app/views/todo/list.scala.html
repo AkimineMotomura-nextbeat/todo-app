@@ -5,29 +5,25 @@
 @import lib.model.Todo
 @import lib.model.Category
 @import helper._
-@(todos: Seq[Todo], categorys: Seq[Category], colors: Seq[String], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+@(todos: Seq[Todo], categorys: Seq[Category], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @common.Default(vv){
-<a href="/todo/new" class="link_button">新規作成</a>
-<a href="/todo/category/list" class="link_button">カテゴリー</a>
+<a href="@routes.TodoController.register" class="link_button">新規作成</a>
+<a href="@routes.CategoryController.list" class="link_button">カテゴリー</a>
 <ul id="todo_list">
     @for(todo <- todos){
         @*
         *どう表示するかは後で考える
         *@
-        <li><div class="todoPanel" style="background-color: @(colors(categorys.find(_.id.get == todo.category).get.color))">
-            <a href="/todo/@todo.id">
+        <li><div class="todoPanel" style="background-color: @(categorys.find(_.id.get == todo.category).getOrElse(Category(None, "ERROR", "error", Category.ColorStatus.GRAY)).color.name)">
+            <a href="@routes.TodoController.edit(todo.id.get)">
                 <div>
                     <h3>@todo.title</h3>
                     <p>@todo.content</p>
                     <div>
-                        <p>@categorys.find(_.id.get == todo.category).get.name</p> @* <- コーナーケースがありそうな危うさ *@
+                        <p>@categorys.find(_.id.get == todo.category).getOrElse(Category(None, "ERROR", "error", Category.ColorStatus.GRAY)).name</p>
                         <p>
-                            @(todo.state.code match {
-                                case 0 => "TODO(着手前)"
-                                case 1 => "進行中"
-                                case 2 => "完了"
-                             })
+                            @(todo.state.name)
                         </p>
                         @helper.form(action = routes.TodoController.delete()){
                         @helper.CSRF.formField

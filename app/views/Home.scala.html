@@ -7,7 +7,7 @@
 @(vv: model.ViewValueCommon)
 @common.Default(vv){
   <ul>
-    <li><a>カテゴリー一覧</a></li>
-    <li><a href="http://localhost:9000/todo/list">Todo一覧</a></li>
+    <li><a href="@routes.CategoryController.list">カテゴリー一覧</a></li>
+    <li><a href="@routes.TodoController.todoList">Todo一覧</a></li>
   </ul>
 }

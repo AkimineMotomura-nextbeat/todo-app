@@ -26,9 +26,9 @@ object Todo {
     //ステータス
     sealed abstract class Status(val code: Short, val name: String) extends EnumStatus
     object Status extends EnumStatus.Of[Status] {
-        case object UNTOUCHED extends Status(code = 0, name = "untouched")
-        case object TOUCHED extends Status(code = 1, name = "touched")
-        case object COMPLETE extends Status(code = 2, name = "complete")
+        case object UNTOUCHED extends Status(code = 0, name = "TODO(着手前)")
+        case object TOUCHED extends Status(code = 1, name = "進行中")
+        case object COMPLETE extends Status(code = 2, name = "完了")
     }
 
     def apply(title: String, content: String, category: Long): WithNoId = {

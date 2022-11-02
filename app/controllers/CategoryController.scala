@@ -47,7 +47,7 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
     
     for {
       categorys <- categoryRepos.all
-    } yield Ok(views.html.todo.category.list(categorys.map(_.v), Category.colors, vv))
+    } yield Ok(views.html.todo.category.list(categorys.map(_.v), vv))
   }
 
   /**
@@ -64,17 +64,18 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
   def edit(id: Long) = Action async { implicit req =>
     val vv = ViewValueHome(
       title  = "",
-      cssSrc = Seq("main.css"),
+      cssSrc = Seq("main.css", "editor.css"),
       jsSrc  = Seq("main.js")
     )
 
     for {
-      category_opt <- categoryRepos.get(Category.Id(id))
       category_seq <- categoryRepos.all
     }yield {
+      val category_opt = category_seq.find(_.id == id)
+      
       category_opt match {
         case Some(category) => {
-          val filledForm = form.fill(CategoryFormData(category.v.name, category.v.slug, category.v.color))
+          val filledForm = form.fill(CategoryFormData(category.v.name, category.v.slug, category.v.color.code))
           Ok(views.html.todo.category.editor(category.id, category_seq.map(_.v), filledForm, vv))
         }
         case None       => NotFound(views.html.error.page404())
@@ -88,7 +89,7 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
   def register() = Action async {implicit req =>
     val vv = ViewValueHome(
       title  = "",
-      cssSrc = Seq("main.css"),
+      cssSrc = Seq("main.css", "editor.css"),
       jsSrc  = Seq("main.js")
     )
 
@@ -123,33 +124,27 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
       // 処理が成功した場合に呼び出される関数
       (categoryFormData: CategoryFormData) => {
         //DBのデータをupdate
-        //コーナーケースの抜けができているかも?
-
-        //変更前のtodoを入手
-        val category_old = Await.ready(categoryRepos.get(Category.Id(id)), Duration.Inf) 
-        category_old onComplete {
-          case Success(_) => println(categoryFormData.name) //debug
-          case Failure(_) => throw new java.io.IOException("Failed to fetch a data from DB")
-        }
-
-        //todoFormDataから変更情報をコピーしてDB更新
-        category_old.value.get.get match {
-          case Some(todo) => {
-            for {
-              response <- categoryRepos.update(todo.map(_.copy( name=categoryFormData.name, 
-                                                            slug=categoryFormData.slug, 
-                                                            color=categoryFormData.color.toShort)))
-            } yield {
-              response match {
-                case None     => NotFound(views.html.error.page404())
-                case Some(_)  => Redirect("/todo/category/list")
+        val rtv = for {
+          category_old <- categoryRepos.get(Category.Id(id))
+        } yield {
+          category_old match {
+            case None => Future.successful(NotFound(views.html.error.page404()))
+            case Some(category) => {
+              for {
+                response <- categoryRepos.update(category.map(_.copy( name=categoryFormData.name, 
+                                                                      slug=categoryFormData.slug,
+                                                                      color=Category.ColorStatus.apply(categoryFormData.color.toShort))))
+              } yield {
+                response match {
+                  case Some(_)  => Redirect("/todo/category/list")
+                  case None     => NotFound(views.html.error.page404())
+                }
               }
             }
           }
-          case None       => {
-            Future.successful(NotFound(views.html.error.page404()))
-          }
         }
+
+        rtv.flatten
       }
     )
   }
@@ -178,10 +173,12 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
       // 処理が成功した場合に呼び出される関数
       (categoryFormData: CategoryFormData) => {
         //DBに追加
-        val category_new = Category.apply(categoryFormData.name, categoryFormData.slug, color=categoryFormData.color.toShort)
-        Await.ready(categoryRepos.add(category_new), Duration.Inf)
-
-        Future.successful(Redirect("/todo/category/list"))
+        val category_new = Category.apply(categoryFormData.name, categoryFormData.slug, color=Category.ColorStatus.apply(categoryFormData.color.toShort))
+        for {
+          id <- categoryRepos.add(category_new)
+        } yield {
+          Redirect("/todo/category/list")
+        }
       }
     )
   }
@@ -196,9 +193,12 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
         import scala.util.control.Exception._
         catching(classOf[NumberFormatException]) opt id_str.toLong match {
           case Some(id) => {
-            Await.ready(categoryRepos.remove(Category.Id(id)), Duration.Inf) //<- DBの成否判定が必要?
+            for {
+              old <- categoryRepos.remove(Category.Id(id))
+            } yield(old) //old評価しないと実行されないのでは？
             
             //CategoryControllerでtodoTable操作してしまってるのが良く無いかも
+            //削除したカテゴリーが設定されているtodoをnoCategoryに更新
             for {
               todo_list <- todoRepos.all
             } yield {

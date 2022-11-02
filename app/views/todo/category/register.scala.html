@@ -9,6 +9,8 @@
 
 @common.Default(vv){
     <h2>編集画面</h2>
+    <a href="@routes.CategoryController.list" class="link_button">戻る</a>
+
     @helper.form(action = routes.CategoryController.store()) {
         @CSRF.formField
         @inputText(form("name"))

@@ -9,18 +9,15 @@
 
 @common.Default(vv){
     <h2>編集画面</h2>
+    <a href="@routes.CategoryController.list" class="link_button">戻る</a>
+
     @helper.form(action = routes.CategoryController.update(id)) {
         @CSRF.formField
         @inputText(form("name"))
         @inputText(form("slug"))
         @select(
             field = form("color"), 
-            options = Seq(
-                "0" -> "gray", 
-                "1" -> "blue",
-                "2" -> "red",
-                "3" -> "green"
-            )
+            options = Category.ColorStatus.values.map(color => color.code.toString -> color.toString)
         )
         <input type="submit" value="登録">
     }

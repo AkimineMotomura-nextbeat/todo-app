@@ -9,6 +9,8 @@
 
 @common.Default(vv){
     <h2>新規登録</h2>
+    <a href="@routes.TodoController.todoList" class="link_button">戻る</a>
+
     @helper.form(action = routes.TodoController.store()) {
         @helper.CSRF.formField
         @helper.inputText(form("title"))

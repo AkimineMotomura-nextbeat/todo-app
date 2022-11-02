@@ -4,22 +4,21 @@
 
 @import helper._
 @import controllers.TodoFormData
+@import lib.model.Todo
 @import lib.model.Category
 @(id: Long, form: Form[TodoFormData], categorys: Seq[Category], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @common.Default(vv){
     <h2>編集画面</h2>
+    <a href="@routes.TodoController.todoList" class="link_button">戻る</a>
+
     @helper.form(action = routes.TodoController.update(id)) {
         @CSRF.formField
         @inputText(form("title"))
         @textarea(form("content"), 'rows -> 7, 'cols -> 40)
         @select(
             field = form("state"), 
-            options = Seq(
-                "0" -> "TODO(着手前)", 
-                "1" -> "進行中",
-                "2" -> "完了"
-            )
+            options = Todo.Status.values.map(state => state.code.toString -> state.name)
         )
         @select(
             field = form("category"),

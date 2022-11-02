@@ -22,4 +22,5 @@ ul#todo_list{
     text-decoration: none;
     background-color: blanchedalmond;
     color: black;
+    border-radius: 5px;
 }
