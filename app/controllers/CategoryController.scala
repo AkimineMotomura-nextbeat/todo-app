@@ -25,7 +25,7 @@ import lib.persistence._
 case class CategoryFormData(
   name: String,
   slug: String,
-  color: Int
+  color: Category.ColorStatus
 )
 
 @Singleton
@@ -57,7 +57,9 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
     mapping(
       "name" -> nonEmptyText,
       "slug" -> nonEmptyText.verifying(Constraints.pattern("[0-9a-zA-Z]+".r)), 
-      "color" -> number.verifying(min(0), max(255))
+      "color" -> mapping(
+        "color" -> number.verifying(min(0), max(255))
+      )(x => Category.ColorStatus.apply(x.toShort))(x => Some(x.code.toInt))
     )(CategoryFormData.apply)(CategoryFormData.unapply)
   )
   
@@ -75,7 +77,7 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
       
       category_opt match {
         case Some(category) => {
-          val filledForm = form.fill(CategoryFormData(category.v.name, category.v.slug, category.v.color.code))
+          val filledForm = form.fill(CategoryFormData(category.v.name, category.v.slug, category.v.color))
           Ok(views.html.todo.category.editor(category.id, category_seq.map(_.v), filledForm, vv))
         }
         case None       => NotFound(views.html.error.page404())
@@ -133,7 +135,7 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
               for {
                 response <- categoryRepos.update(category.map(_.copy( name=categoryFormData.name, 
                                                                       slug=categoryFormData.slug,
-                                                                      color=Category.ColorStatus.apply(categoryFormData.color.toShort))))
+                                                                      color=categoryFormData.color)))
               } yield {
                 response match {
                   case Some(_)  => Redirect("/todo/category/list")
@@ -173,7 +175,7 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
       // 処理が成功した場合に呼び出される関数
       (categoryFormData: CategoryFormData) => {
         //DBに追加
-        val category_new = Category.apply(categoryFormData.name, categoryFormData.slug, color=Category.ColorStatus.apply(categoryFormData.color.toShort))
+        val category_new = Category.apply(categoryFormData.name, categoryFormData.slug, color=categoryFormData.color)
         for {
           id <- categoryRepos.add(category_new)
         } yield {
@@ -195,7 +197,7 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
           case Some(id) => {
             for {
               old <- categoryRepos.remove(Category.Id(id))
-            } yield(old) //old評価しないと実行されないのでは？
+            } yield(old)
             
             //CategoryControllerでtodoTable操作してしまってるのが良く無いかも
             //削除したカテゴリーが設定されているtodoをnoCategoryに更新
@@ -203,7 +205,7 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
               todo_list <- todoRepos.all
             } yield {
               for (todo <- todo_list if todo.v.category == id) {
-                todoRepos.update(todo.map(_.copy(category=6))) //category(6): noCateogry
+                todoRepos.update(todo.map(_.copy(category=Category.Id(6)))) //category(6): noCateogry
               }
             
               Redirect("/todo/category/list")

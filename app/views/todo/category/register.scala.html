@@ -13,16 +13,17 @@
 
     @helper.form(action = routes.CategoryController.store()) {
         @CSRF.formField
-        @inputText(form("name"))
-        @inputText(form("slug"))
+        @inputText(form("name"), '_label -> "カテゴリ名")
+        @inputText(form("slug"), '_label -> "slug")
         @select(
-            field = form("color"), 
+            field = form("color.color"), 
             options = Seq(
                 "0" -> "gray", 
                 "1" -> "blue",
                 "2" -> "red",
                 "3" -> "green"
-            )
+            ),
+            '_label -> "色設定"
         )
         <input type="submit" value="登録">
     }

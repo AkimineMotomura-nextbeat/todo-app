@@ -25,12 +25,12 @@ import lib.persistence._
 case class TodoFormData(
   title: String,
   content: String,
-  category: Long, 
-  state: Int
+  category: Category.Id, 
+  state: Todo.Status
 )
 
 @Singleton
-class TodoController @Inject()(val controllerComponents: ControllerComponents/*, todoRepos: TodoRepository[slick.jdbc.JdbcProfile]*/) //TodoRepository <- constructorが見つからない???
+class TodoController @Inject()(val controllerComponents: ControllerComponents)
     extends BaseController with play.api.i18n.I18nSupport {
 
   val todoRepos = onMySQL.TodoRepository
@@ -58,8 +58,12 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents/*,
     mapping(
       "title" -> nonEmptyText,
       "content" -> text,
-      "category" -> longNumber,
-      "state" -> number.verifying(min(0), max(2))
+      "category" -> mapping(
+        "category" -> longNumber
+      )(Category.Id.apply)(x => Some(x.toLong)), 
+      "state" -> mapping(
+        "state" -> number.verifying(min(0), max(2))
+      )(x => Todo.Status.apply(x.toShort))(x => Some(x.code.toInt))
     )(TodoFormData.apply)(TodoFormData.unapply)
   )
   
@@ -79,7 +83,7 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents/*,
     }yield {
       todo_opt match {
         case Some(todo) => {
-          val filledForm = form.fill(TodoFormData(todo.v.title, todo.v.content, todo.v.category, todo.v.state.code))
+          val filledForm = form.fill(TodoFormData(todo.v.title, todo.v.content, todo.v.category, todo.v.state))
           Ok(views.html.todo.editor(todo.id, filledForm, category_seq.map(_.v), vv))
         }
         case None       => NotFound(views.html.error.page404())
@@ -99,7 +103,7 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents/*,
     for {
       categorys <- categoryRepos.all
     } yield {
-      val initForm = form.fill(TodoFormData("", "", 0, 0))
+      val initForm = form.fill(TodoFormData("", "", Category.Id(0), Todo.Status.UNTOUCHED))
       Ok(views.html.todo.register(initForm, categorys.map(_.v), vv))
     }
   }
@@ -135,7 +139,7 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents/*,
                 response <- todoRepos.update(todo.map(_.copy( title=todoFormData.title, 
                                                               content=todoFormData.content, 
                                                               category=todoFormData.category, 
-                                                              state=Todo.Status.apply(todoFormData.state.toShort))))
+                                                              state=todoFormData.state)))
               } yield {
                 response match {
                   case None     => NotFound(views.html.error.page404())

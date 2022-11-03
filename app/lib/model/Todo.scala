@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 import Todo._
 case class Todo(
     id:         Option[Id],
-    category:   Long,
+    category:   Category.Id,
     title:      String,
     content:    String,
     state:      Status,
@@ -31,7 +31,7 @@ object Todo {
         case object COMPLETE extends Status(code = 2, name = "完了")
     }
 
-    def apply(title: String, content: String, category: Long): WithNoId = {
+    def apply(title: String, content: String, category: Category.Id): WithNoId = {
         new Entity.WithNoId(
             new Todo(
                 id = None,

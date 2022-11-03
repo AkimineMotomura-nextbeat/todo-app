@@ -14,15 +14,17 @@
 
     @helper.form(action = routes.TodoController.update(id)) {
         @CSRF.formField
-        @inputText(form("title"))
-        @textarea(form("content"), 'rows -> 7, 'cols -> 40)
+        @inputText(form("title"), '_label -> "タイトル")
+        @textarea(form("content"), 'rows -> 7, 'cols -> 40, '_label -> "本文")
         @select(
-            field = form("state"), 
-            options = Todo.Status.values.map(state => state.code.toString -> state.name)
+            field = form("state.state"), 
+            options = Todo.Status.values.map(state => state.code.toString -> state.name),
+            '_label -> "進行状況"
         )
         @select(
-            field = form("category"),
-            options = categorys.map(category => category.id.get.toString -> category.name)
+            field = form("category.category"),
+            options = categorys.map(category => category.id.get.toString -> category.name),
+            '_label -> "カテゴリ設定"
         )
         <input type="submit" value="登録">
     }

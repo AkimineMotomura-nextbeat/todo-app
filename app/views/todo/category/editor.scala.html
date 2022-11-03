@@ -13,11 +13,12 @@
 
     @helper.form(action = routes.CategoryController.update(id)) {
         @CSRF.formField
-        @inputText(form("name"))
-        @inputText(form("slug"))
+        @inputText(form("name"), '_label -> "カテゴリ名")
+        @inputText(form("slug"), '_label -> "slug")
         @select(
-            field = form("color"), 
-            options = Category.ColorStatus.values.map(color => color.code.toString -> color.toString)
+            field = form("color.color"), 
+            options = Category.ColorStatus.values.map(color => color.code.toString -> color.toString),
+            '_label -> "色設定"
         )
         <input type="submit" value="登録">
     }

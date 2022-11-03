@@ -13,12 +13,13 @@
 
     @helper.form(action = routes.TodoController.store()) {
         @helper.CSRF.formField
-        @helper.inputText(form("title"))
-        @helper.textarea(form("content"), 'rows -> 7, 'cols -> 40)
+        @helper.inputText(form("title"), '_label -> "タイトル")
+        @helper.textarea(form("content"), 'rows -> 7, 'cols -> 40, '_label -> "本文")
         @helper.select(
-            field = form("category"),
+            field = form("category.category"),
             options = categorys.map(category => category.id.get.toString -> category.name),
-            '_default -> "choose one"
+            '_default -> "choose one",
+            '_label -> "カテゴリ設定"
         )
         @inputText(form("state"), 'class -> "info", '_label -> "")
         <input type="submit" value="登録">
