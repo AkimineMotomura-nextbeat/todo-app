@@ -32,8 +32,8 @@ case class CategoryFormData(
 class CategoryController @Inject()(val controllerComponents: ControllerComponents/*, todoRepos: TodoRepository[slick.jdbc.JdbcProfile]*/) //TodoRepository <- constructorが見つからない???
     extends BaseController with play.api.i18n.I18nSupport {
 
-  val todoRepos = new TodoRepository[slick.jdbc.JdbcProfile]()(onMySQL.driver)
-  val categoryRepos = new CategoryRepository[slick.jdbc.JdbcProfile]()(onMySQL.driver)
+  val todoRepos = onMySQL.TodoRepository
+  val categoryRepos = onMySQL.CategoryRepository
 
   /**
     * GET /todo/list
@@ -161,7 +161,7 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
       (formWithErrors: Form[CategoryFormData]) => {
         val vv = ViewValueHome(
           title  = "",
-          cssSrc = Seq("main.css"),
+          cssSrc = Seq("main.css", "editor.css"),
           jsSrc  = Seq("main.js")
         )
 

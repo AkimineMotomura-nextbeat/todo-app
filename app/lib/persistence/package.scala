@@ -5,6 +5,8 @@
 
 package lib
 
+import com.softwaremill.macwire._
+
 package object persistence {
 
   val default = onMySQL

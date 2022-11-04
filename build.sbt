@@ -26,6 +26,13 @@ libraryDependencies ++= Seq(
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.example.controllers._"
 
+libraryDependencies ++= Seq(
+  "com.softwaremill.macwire" %% "macros" % "2.5.8" % "provided",
+  "com.softwaremill.macwire" %% "macrosakka" % "2.5.8" % "provided",
+  "com.softwaremill.macwire" %% "util" % "2.5.8",
+  "com.softwaremill.macwire" %% "proxy" % "2.5.8"
+)
+
 // Adds additional packages into conf/routes
 // play.sbt.routes.RoutesKeys.routesImport += "com.example.binders._"
 

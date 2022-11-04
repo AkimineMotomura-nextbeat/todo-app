@@ -16,6 +16,9 @@ import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
+import slick.jdbc.JdbcProfile
+
+import com.softwaremill.macwire._
 
 import model.ViewValueHome
 import lib.model.Todo
@@ -121,9 +124,12 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents)
           cssSrc = Seq("main.css"),
           jsSrc  = Seq("main.js")
         )
-        
-        val d: Seq[Category] = Seq[Category]() //仮置き
-        Future.successful(BadRequest(views.html.todo.editor(id, formWithErrors, d, vv)))
+
+        for {
+          category_seq <- categoryRepos.all
+        }yield {
+          BadRequest(views.html.todo.editor(id, formWithErrors, category_seq.map(_.v), vv))
+        }
       },
 
       // 処理が成功した場合に呼び出される関数
