@@ -11,12 +11,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Success, Failure}
 import scala.concurrent.duration._
 
-import javax.inject._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation._
 import play.api.data.validation.Constraints._
+import slick.jdbc.JdbcProfile
 
 import model.ViewValueHome
 import lib.model.Category
@@ -28,12 +28,8 @@ case class CategoryFormData(
   color: Category.ColorStatus
 )
 
-@Singleton
-class CategoryController @Inject()(val controllerComponents: ControllerComponents/*, todoRepos: TodoRepository[slick.jdbc.JdbcProfile]*/) //TodoRepository <- constructorが見つからない???
+class CategoryController (val controllerComponents: ControllerComponents, val categoryRepos: CategoryRepository[_ <: JdbcProfile], val todoRepos: TodoRepository[_ <: JdbcProfile])
     extends BaseController with play.api.i18n.I18nSupport {
-
-  val todoRepos = onMySQL.TodoRepository
-  val categoryRepos = onMySQL.CategoryRepository
 
   /**
     * GET /todo/list

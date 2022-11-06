@@ -11,14 +11,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Success, Failure}
 import scala.concurrent.duration._
 
-import javax.inject._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
 import slick.jdbc.JdbcProfile
-
-import com.softwaremill.macwire._
 
 import model.ViewValueHome
 import lib.model.Todo
@@ -32,12 +29,8 @@ case class TodoFormData(
   state: Todo.Status
 )
 
-@Singleton
-class TodoController @Inject()(val controllerComponents: ControllerComponents)
+class TodoController (val controllerComponents: ControllerComponents, val categoryRepos: CategoryRepository[_ <: JdbcProfile], val todoRepos: TodoRepository[_ <: JdbcProfile])
     extends BaseController with play.api.i18n.I18nSupport {
-
-  val todoRepos = onMySQL.TodoRepository
-  val categoryRepos = onMySQL.CategoryRepository
 
   /**
     * GET /todo/list
