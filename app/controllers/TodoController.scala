@@ -33,11 +33,8 @@ case class TodoFormData(
 )
 
 @Singleton
-class TodoController @Inject()(val controllerComponents: ControllerComponents)
+class TodoController @Inject()(val controllerComponents: ControllerComponents, val categoryRepos: CategoryRepository[JdbcProfile], val todoRepos: TodoRepository[JdbcProfile])
     extends BaseController with play.api.i18n.I18nSupport {
-
-  val todoRepos = onMySQL.TodoRepository
-  val categoryRepos = onMySQL.CategoryRepository
 
   /**
     * GET /todo/list

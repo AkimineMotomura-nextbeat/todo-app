@@ -1,12 +1,14 @@
 package lib.persistence
 
+import javax.inject.Inject
+
 import scala.concurrent.Future
 import ixias.persistence.SlickRepository
 import slick.jdbc.JdbcProfile
 
 import lib.model.Category
 
-case class CategoryRepository[P <: JdbcProfile]()(implicit val driver: P)
+case class CategoryRepository[P <: JdbcProfile] @Inject() ()(implicit val driver: P)
   extends SlickRepository[Category.Id, Category, P]
   with db.SlickResourceProvider[P]{
 

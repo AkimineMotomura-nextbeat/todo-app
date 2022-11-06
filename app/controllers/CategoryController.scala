@@ -17,6 +17,7 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation._
 import play.api.data.validation.Constraints._
+import slick.jdbc.JdbcProfile
 
 import model.ViewValueHome
 import lib.model.Category
@@ -29,11 +30,8 @@ case class CategoryFormData(
 )
 
 @Singleton
-class CategoryController @Inject()(val controllerComponents: ControllerComponents/*, todoRepos: TodoRepository[slick.jdbc.JdbcProfile]*/) //TodoRepository <- constructorが見つからない???
+class CategoryController @Inject()(val controllerComponents: ControllerComponents, val categoryRepos: CategoryRepository[JdbcProfile], val todoRepos: TodoRepository[JdbcProfile])
     extends BaseController with play.api.i18n.I18nSupport {
-
-  val todoRepos = onMySQL.TodoRepository
-  val categoryRepos = onMySQL.CategoryRepository
 
   /**
     * GET /todo/list

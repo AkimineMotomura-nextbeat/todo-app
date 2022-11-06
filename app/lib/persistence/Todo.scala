@@ -1,12 +1,14 @@
 package lib.persistence
 
+import javax.inject.Inject
+
 import scala.concurrent.Future
 import ixias.persistence.SlickRepository
 import slick.jdbc.JdbcProfile
 
 import lib.model.Todo
 
-case class TodoRepository[P <: JdbcProfile]()(implicit val driver: P)
+case class TodoRepository[P <: JdbcProfile] @Inject() ()(implicit val driver: P)
   extends SlickRepository[Todo.Id, Todo, P]
   with db.SlickResourceProvider[P]{
 
