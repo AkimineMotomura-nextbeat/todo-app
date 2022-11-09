@@ -8,7 +8,7 @@ GET     /                                 controllers.HomeController.index
 
 ## Todo
 # 一覧ページ
-GET     /todo/list                        controllers.TodoController.todoList
+GET     /todo/list                        controllers.TodoController.list
 #新規作成ページ
 GET     /todo/new                         controllers.TodoController.register
 #　編集ページ

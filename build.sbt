@@ -35,6 +35,3 @@ libraryDependencies ++= Seq(
 
 // Adds additional packages into conf/routes
 // play.sbt.routes.RoutesKeys.routesImport += "com.example.binders._"
-
-lazy val slickCodeGen = taskKey[Unit]("execute Slick CodeGen")
-slickCodeGen         := (runMain in Compile).toTask(" tasks.SlickCodeGen").value

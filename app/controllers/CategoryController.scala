@@ -22,54 +22,27 @@ import model.ViewValueHome
 import lib.model.Category
 import lib.persistence._
 
-case class CategoryFormData(
-  name: String,
-  slug: String,
-  color: Category.ColorStatus
-)
-
 @Singleton
-class CategoryController @Inject()(val controllerComponents: ControllerComponents/*, todoRepos: TodoRepository[slick.jdbc.JdbcProfile]*/) //TodoRepository <- constructorが見つからない???
+class CategoryController @Inject()(val controllerComponents: ControllerComponents)
     extends BaseController with play.api.i18n.I18nSupport {
 
   val todoRepos = onMySQL.TodoRepository
   val categoryRepos = onMySQL.CategoryRepository
 
   /**
-    * GET /todo/list
+    * GET /todo/category/list
     */
   def list() = Action async { implicit req =>
-    val vv = ViewValueHome(
-      title  = "Category list",
-      cssSrc = Seq("main.css", "list.css"),
-      jsSrc  = Seq("main.js")
-    )
-    
     for {
       categorys <- categoryRepos.all
-    } yield Ok(views.html.todo.category.list(categorys.map(_.v), vv))
+    } yield Ok(views.html.todo.category.list(categorys.map(_.v), ViewValueHome.vv_list))
   }
 
   /**
-    * GET /todo/:id
+    * GET /todo/category/:id
     */
-  val form = Form(
-    mapping(
-      "name" -> nonEmptyText,
-      "slug" -> nonEmptyText.verifying(Constraints.pattern("[0-9a-zA-Z]+".r)), 
-      "color" -> mapping(
-        "color" -> number.verifying(min(0), max(255))
-      )(x => Category.ColorStatus.apply(x.toShort))(x => Some(x.code.toInt))
-    )(CategoryFormData.apply)(CategoryFormData.unapply)
-  )
   
   def edit(id: Long) = Action async { implicit req =>
-    val vv = ViewValueHome(
-      title  = "",
-      cssSrc = Seq("main.css", "editor.css"),
-      jsSrc  = Seq("main.js")
-    )
-
     for {
       category_seq <- categoryRepos.all
     }yield {
@@ -77,8 +50,8 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
       
       category_opt match {
         case Some(category) => {
-          val filledForm = form.fill(CategoryFormData(category.v.name, category.v.slug, category.v.color))
-          Ok(views.html.todo.category.editor(category.id, category_seq.map(_.v), filledForm, vv))
+          val filledForm = CategoryFormData.apply(category)
+          Ok(views.html.todo.category.editor(category.id, category_seq.map(_.v), filledForm, ViewValueHome.vv_edit))
         }
         case None       => NotFound(views.html.error.page404())
       }
@@ -86,89 +59,84 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
   }
 
   /**
-   * GET /todo/new
+   * GET /todo/category/new
   */
   def register() = Action async {implicit req =>
-    val vv = ViewValueHome(
-      title  = "",
-      cssSrc = Seq("main.css", "editor.css"),
-      jsSrc  = Seq("main.js")
-    )
-
     for {
         category_seq <- categoryRepos.all
     } yield {
-        Ok(views.html.todo.category.register(category_seq.map(_.v), form, vv))
+        Ok(views.html.todo.category.register(category_seq.map(_.v), CategoryFormData.form, ViewValueHome.vv_edit))
     }
   }
 
   /**
-    * POST /todo/:id/update
+    * POST /todo/category/:id/update
     */
   def update(id: Long) = Action async { implicit request: Request[AnyContent] =>
-    form.bindFromRequest().fold(
+    CategoryFormData.form.bindFromRequest().fold(
       // 処理が失敗した場合に呼び出される関数
       // 処理失敗の例: バリデーションエラー
       (formWithErrors: Form[CategoryFormData]) => {
-        val vv = ViewValueHome(
-          title  = "",
-          cssSrc = Seq("main.css"),
-          jsSrc  = Seq("main.js")
-        )
-        
         for {
             category_seq <- categoryRepos.all
         } yield {
-            BadRequest(views.html.todo.category.editor(id, category_seq.map(_.v), formWithErrors, vv))
+            BadRequest(views.html.todo.category.editor(id, category_seq.map(_.v), formWithErrors, ViewValueHome.vv_edit))
         }
       },
 
       // 処理が成功した場合に呼び出される関数
       (categoryFormData: CategoryFormData) => {
         //DBのデータをupdate
-        val rtv = for {
+        for {
           category_old <- categoryRepos.get(Category.Id(id))
+          response = category_old match {
+            case None => None
+            case Some(category) => categoryRepos.update(category.map(_.copy(  name=categoryFormData.name, 
+                                                                                  slug=categoryFormData.slug,
+                                                                                  color=categoryFormData.color)))
+          }
         } yield {
+          response match {
+            case Some(_)  => Redirect(routes.CategoryController.list)
+            case None     => NotFound(views.html.error.page404())
+          }
+        }
+
+        /*
+        展開したいもののイメージ
+
+        categoryRepos.get(Category.Id(id)) flatMap { category_old => 
           category_old match {
             case None => Future.successful(NotFound(views.html.error.page404()))
             case Some(category) => {
-              for {
-                response <- categoryRepos.update(category.map(_.copy( name=categoryFormData.name, 
-                                                                      slug=categoryFormData.slug,
-                                                                      color=categoryFormData.color)))
-              } yield {
+              categoryRepos.update(category_old.get.map(_.copy( name=categoryFormData.name, 
+                                                                slug=categoryFormData.slug,
+                                                                color=categoryFormData.color))) flatMap { response =>
                 response match {
-                  case Some(_)  => Redirect("/todo/category/list")
-                  case None     => NotFound(views.html.error.page404())
+                  case Some(_)  => Future.successful(Redirect(routes.CategoryController.list))
+                  case None     => Future.successful(NotFound(views.html.error.page404()))
                 }
               }
             }
           }
         }
-
-        rtv.flatten
+        */
       }
     )
   }
 
   /**
-   * POST /todo/new
+   * POST /todo/category/new
   */
   def store() = Action async {implicit req =>
-    form.bindFromRequest().fold(
+    CategoryFormData.form.bindFromRequest().fold(
       // 処理が失敗した場合に呼び出される関数
       // 処理失敗の例: バリデーションエラー
       (formWithErrors: Form[CategoryFormData]) => {
-        val vv = ViewValueHome(
-          title  = "",
-          cssSrc = Seq("main.css", "editor.css"),
-          jsSrc  = Seq("main.js")
-        )
-
         for {
           categorys <- categoryRepos.all
         } yield {
-          BadRequest(views.html.todo.category.register(categorys.map(_.v), formWithErrors, vv))
+          BadRequest(views.html.todo.category.register(categorys.map(_.v), formWithErrors, ViewValueHome.vv_edit))
         }
       },
 
@@ -179,14 +147,14 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
         for {
           id <- categoryRepos.add(category_new)
         } yield {
-          Redirect("/todo/category/list")
+          Redirect(routes.CategoryController.list)
         }
       }
     )
   }
 
   /**
-   * 対象のデータを削除する
+   * POST   /todo/category/delete
    */
   def delete() = Action async { implicit request: Request[AnyContent] =>
     // requestから直接値を取得する
@@ -195,26 +163,32 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
         import scala.util.control.Exception._
         catching(classOf[NumberFormatException]) opt id_str.toLong match {
           case Some(id) => {
+            val t = todoRepos.all
             for {
               old <- categoryRepos.remove(Category.Id(id))
-            } yield(old)
-            
-            //CategoryControllerでtodoTable操作してしまってるのが良く無いかも
-            //削除したカテゴリーが設定されているtodoをnoCategoryに更新
-            for {
-              todo_list <- todoRepos.all
-            } yield {
-              for (todo <- todo_list if todo.v.category == id) {
-                todoRepos.update(todo.map(_.copy(category=Category.Id(6)))) //category(6): noCateogry
+              todo_list <- t
+              results = old match {
+                case None => Seq.empty
+                case Some(_) => {
+                  todo_list.filter(_.v.category == id).map( todo => 
+                    todoRepos.update(todo.map(_.copy(category=Category.Id(6)))) //category(6): noCateogry
+                  )
+                }
               }
-            
-              Redirect("/todo/category/list")
+            } yield {
+              results.find(_ == Future.successful(None)) match {
+                case None => Redirect(routes.CategoryController.list)
+                case Some(_) => Redirect(routes.CategoryController.list) //500errorに置き換え
+              }
             }
+            
+            //これではない気がします
+            //CategoryControllerでtodoTable操作してしまってるのが良く無いかも
           }
-          case None     => Future.successful(BadRequest("/todo/category/list"))
+          case None     => Future.successful(BadRequest("Invalid id"))
         }
       }
-      case None      => Future.successful(BadRequest("/todo/category/list"))
+      case None      => Future.successful(BadRequest("Invalid id"))
     }
   }
 }

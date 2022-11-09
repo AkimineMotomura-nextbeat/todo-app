@@ -7,7 +7,7 @@
 @(categorys: Seq[Category], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @common.Default(vv){
-<a href="@routes.TodoController.todoList" class="link_button">戻る</a>
+<a href="@routes.TodoController.list" class="link_button">戻る</a>
 <a href="@routes.CategoryController.register" class="link_button">新規作成</a>
 <ul id="todo_list">
     @for(category <- categorys if category.id.get != 6){

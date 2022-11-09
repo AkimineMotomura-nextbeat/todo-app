@@ -31,7 +31,7 @@ object Category {
 
 
     def apply(name: String, slug: String, color: ColorStatus): WithNoId = {
-        new Entity.WithNoId(
+        Entity.WithNoId.apply(
             new Category(
                 id = None,
                 name = name,
