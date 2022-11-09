@@ -8,7 +8,7 @@ package controllers
 
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{Success, Failure}
+import scala.util.{Success, Failure, Try}
 import scala.concurrent.duration._
 
 import javax.inject._
@@ -26,11 +26,8 @@ import lib.model.Category
 import lib.persistence._
 
 @Singleton
-class TodoController @Inject()(val controllerComponents: ControllerComponents)
+class TodoController @Inject()(val controllerComponents: ControllerComponents, val categoryRepos: CategoryRepository[_ <: JdbcProfile], val todoRepos: TodoRepository[_ <: JdbcProfile])
     extends BaseController with play.api.i18n.I18nSupport {
-
-  val todoRepos = onMySQL.TodoRepository
-  val categoryRepos = onMySQL.CategoryRepository
 
   /**
     * GET /todo/list
@@ -93,8 +90,8 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents)
         //DBのデータをupdate
         for {
           todo_old <- todoRepos.get(Todo.Id(id))
-          response = todo_old match {
-            case None => None
+          response <- todo_old match {
+            case None => Future.successful(None)
             case Some(todo) => todoRepos.update(todo.map(_.copy( title=todoFormData.title, 
                                                         content=todoFormData.content, 
                                                         category=todoFormData.category, 
@@ -118,6 +115,7 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents)
       // 処理が失敗した場合に呼び出される関数
       // 処理失敗の例: バリデーションエラー
       (formWithErrors: Form[TodoFormData]) => {
+        println(formWithErrors.toString)
         for {
           categorys <- categoryRepos.all
         } yield {
@@ -143,24 +141,25 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents)
    */
   def delete() = Action async { implicit request: Request[AnyContent] =>
     // requestから直接値を取得する
-    request.body.asFormUrlEncoded.get("id").headOption match {
-      case Some(id_str)  => {
-        import scala.util.control.Exception._
-        catching(classOf[NumberFormatException]) opt id_str.toLong match {
-          case Some(id) => {
-            for {
-              old <- todoRepos.remove(Todo.Id(id))
-            } yield {
-              old match {
-                case None => Redirect(routes.TodoController.list()) //500errorに置き換え
-                case Some(_) => Redirect(routes.TodoController.list())
-              }
-            }
+    val id = for {
+      body_map <- request.body.asFormUrlEncoded
+      id_str_opt <- body_map.get("id")
+      id_str <- id_str_opt.headOption
+      id <- Try { id_str.toLong } toOption
+    } yield (id)
+
+    id match {
+      case Some(id) => {
+        for {
+          old <- todoRepos.remove(Todo.Id(id))
+        } yield {
+          old match {
+            case None => Redirect(routes.TodoController.list()) //500errorに置き換え
+            case Some(_) => Redirect(routes.TodoController.list())
           }
-          case None     => Future.successful(BadRequest("Invalid id"))
         }
       }
-      case None      => Future.successful(BadRequest("POST message have to include id of todo which delete"))
+      case None     => Future.successful(BadRequest("Invalid id"))
     }
   }
 }

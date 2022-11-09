@@ -8,7 +8,7 @@ package controllers
 
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{Success, Failure}
+import scala.util.{Success, Failure, Try}
 import scala.concurrent.duration._
 
 import javax.inject._
@@ -17,17 +17,17 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation._
 import play.api.data.validation.Constraints._
+import slick.jdbc.JdbcProfile
+
+import com.softwaremill.macwire
 
 import model.ViewValueHome
 import lib.model.Category
 import lib.persistence._
 
 @Singleton
-class CategoryController @Inject()(val controllerComponents: ControllerComponents)
+class CategoryController @Inject()(val controllerComponents: ControllerComponents, val categoryRepos: CategoryRepository[_ <: JdbcProfile], val todoRepos: TodoRepository[_ <: JdbcProfile])
     extends BaseController with play.api.i18n.I18nSupport {
-
-  val todoRepos = onMySQL.TodoRepository
-  val categoryRepos = onMySQL.CategoryRepository
 
   /**
     * GET /todo/category/list
@@ -89,8 +89,8 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
         //DBのデータをupdate
         for {
           category_old <- categoryRepos.get(Category.Id(id))
-          response = category_old match {
-            case None => None
+          response <- category_old match {
+            case None => Future.successful(None)
             case Some(category) => categoryRepos.update(category.map(_.copy(  name=categoryFormData.name, 
                                                                                   slug=categoryFormData.slug,
                                                                                   color=categoryFormData.color)))
@@ -158,37 +158,38 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
    */
   def delete() = Action async { implicit request: Request[AnyContent] =>
     // requestから直接値を取得する
-    request.body.asFormUrlEncoded.get("id").headOption match {
-      case Some(id_str)  => {
-        import scala.util.control.Exception._
-        catching(classOf[NumberFormatException]) opt id_str.toLong match {
-          case Some(id) => {
-            val t = todoRepos.all
-            for {
-              old <- categoryRepos.remove(Category.Id(id))
-              todo_list <- t
-              results = old match {
-                case None => Seq.empty
-                case Some(_) => {
-                  todo_list.filter(_.v.category == id).map( todo => 
-                    todoRepos.update(todo.map(_.copy(category=Category.Id(6)))) //category(6): noCateogry
-                  )
-                }
-              }
-            } yield {
-              results.find(_ == Future.successful(None)) match {
-                case None => Redirect(routes.CategoryController.list)
-                case Some(_) => Redirect(routes.CategoryController.list) //500errorに置き換え
-              }
+    val id = for {
+      body_map <- request.body.asFormUrlEncoded
+      id_str_opt <- body_map.get("id")
+      id_str <- id_str_opt.headOption
+      id <- Try { id_str.toLong } toOption
+    } yield (id)
+
+    id match {
+      case Some(id) => {
+        val t = todoRepos.all
+        for {
+          old <- categoryRepos.remove(Category.Id(id))
+          todo_list <- t
+          results = old match {
+            case None => Seq.empty
+            case Some(_) => {
+              todo_list.filter(_.v.category == id).map( todo => 
+                todoRepos.update(todo.map(_.copy(category=Category.Id(6)))) //category(6): noCateogry
+              )
             }
-            
-            //これではない気がします
-            //CategoryControllerでtodoTable操作してしまってるのが良く無いかも
           }
-          case None     => Future.successful(BadRequest("Invalid id"))
+        } yield {
+          results.find(_ == Future.successful(None)) match {
+            case None => Redirect(routes.CategoryController.list)
+            case Some(_) => Redirect(routes.CategoryController.list) //500errorに置き換え
+          }
         }
+        
+        //これではない気がします
+        //CategoryControllerでtodoTable操作してしまってるのが良く無いかも
       }
-      case None      => Future.successful(BadRequest("Invalid id"))
+      case None     => Future.successful(BadRequest("Invalid id"))
     }
   }
 }
