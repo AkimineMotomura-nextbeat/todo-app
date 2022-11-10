@@ -169,24 +169,23 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
       case Some(id) => {
         val t = todoRepos.all
         for {
-          old <- categoryRepos.remove(Category.Id(id))
           todo_list <- t
-          results = old match {
+          old <- categoryRepos.remove(Category.Id(id))
+          results <- Future.sequence(old match {
             case None => Seq.empty
             case Some(_) => {
               todo_list.filter(_.v.category == id).map( todo => 
                 todoRepos.update(todo.map(_.copy(category=Category.Id(6)))) //category(6): noCateogry
               )
             }
-          }
+          })
         } yield {
-          results.find(_ == Future.successful(None)) match {
+          results.find(_ == None) match {
             case None => Redirect(routes.CategoryController.list)
             case Some(_) => Redirect(routes.CategoryController.list) //500errorに置き換え
           }
         }
         
-        //これではない気がします
         //CategoryControllerでtodoTable操作してしまってるのが良く無いかも
       }
       case None     => Future.successful(BadRequest("Invalid id"))
