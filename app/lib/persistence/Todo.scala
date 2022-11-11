@@ -5,6 +5,7 @@ import ixias.persistence.SlickRepository
 import slick.jdbc.JdbcProfile
 
 import lib.model.Todo
+import lib.model.Category
 
 case class TodoRepository[P <: JdbcProfile]()(implicit val driver: P)
   extends SlickRepository[Todo.Id, Todo, P]
@@ -21,6 +22,12 @@ case class TodoRepository[P <: JdbcProfile]()(implicit val driver: P)
   def all(): Future[Seq[EntityEmbeddedId]] = 
     RunDBAction(TodoTable, "slave") {
       _.result
+    }
+
+  def getByCategoryId(id: Category.Id): Future[Seq[EntityEmbeddedId]] =
+    RunDBAction(TodoTable, "slave") { _
+      .filter(_.category === id)
+      .result
     }
 
   def add(entity: EntityWithNoId): Future[Id] =

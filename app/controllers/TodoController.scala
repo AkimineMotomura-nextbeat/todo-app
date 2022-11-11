@@ -24,6 +24,7 @@ import model.ViewValueHome
 import lib.model.Todo
 import lib.model.Category
 import lib.persistence._
+import views.html.defaultpages.notFound
 
 @Singleton
 class TodoController @Inject()(val controllerComponents: ControllerComponents, val categoryRepos: CategoryRepository[_ <: JdbcProfile], val todoRepos: TodoRepository[_ <: JdbcProfile])
@@ -154,7 +155,7 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents, v
           old <- todoRepos.remove(Todo.Id(id))
         } yield {
           old match {
-            case None => Redirect(routes.TodoController.list()) //500errorに置き換え
+            case None => NotFound(views.html.error.page404())
             case Some(_) => Redirect(routes.TodoController.list())
           }
         }

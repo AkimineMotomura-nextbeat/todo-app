@@ -25,4 +25,8 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     )
     Ok(views.html.Home(vv))
   }
+
+  def notFound() = Action {implicit req =>
+    NotFound(views.html.error.page404())
+  }
 }

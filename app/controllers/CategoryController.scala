@@ -10,8 +10,8 @@ import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Success, Failure, Try}
 import scala.concurrent.duration._
-
 import javax.inject._
+
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
@@ -92,35 +92,15 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
           response <- category_old match {
             case None => Future.successful(None)
             case Some(category) => categoryRepos.update(category.map(_.copy(  name=categoryFormData.name, 
-                                                                                  slug=categoryFormData.slug,
-                                                                                  color=categoryFormData.color)))
+                                                                              slug=categoryFormData.slug,
+                                                                              color=categoryFormData.color)))
           }
         } yield {
           response match {
-            case Some(_)  => Redirect(routes.CategoryController.list)
-            case None     => NotFound(views.html.error.page404())
+            case Some(_)  => Redirect(routes.CategoryController.list) //成功
+            case None     => NotFound(views.html.error.page404()) //category(id)が存在しないため更新不可
           }
         }
-
-        /*
-        展開したいもののイメージ
-
-        categoryRepos.get(Category.Id(id)) flatMap { category_old => 
-          category_old match {
-            case None => Future.successful(NotFound(views.html.error.page404()))
-            case Some(category) => {
-              categoryRepos.update(category_old.get.map(_.copy( name=categoryFormData.name, 
-                                                                slug=categoryFormData.slug,
-                                                                color=categoryFormData.color))) flatMap { response =>
-                response match {
-                  case Some(_)  => Future.successful(Redirect(routes.CategoryController.list))
-                  case None     => Future.successful(NotFound(views.html.error.page404()))
-                }
-              }
-            }
-          }
-        }
-        */
       }
     )
   }
@@ -167,28 +147,31 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
 
     id match {
       case Some(id) => {
-        val t = todoRepos.all
+        val t = todoRepos.getByCategoryId(Category.Id(id))
         for {
-          todo_list <- t
           old <- categoryRepos.remove(Category.Id(id))
-          results <- Future.sequence(old match {
-            case None => Seq.empty
-            case Some(_) => {
-              todo_list.filter(_.v.category == id).map( todo => 
+          todo_list <- t
+          results <- old match {
+            case None => Future.successful(Seq.empty)
+            case Some(value) => {
+              Future.sequence(todo_list.map( todo => 
                 todoRepos.update(todo.map(_.copy(category=Category.Id(6)))) //category(6): noCateogry
-              )
+              ))
             }
-          })
+          }
         } yield {
-          results.find(_ == None) match {
-            case None => Redirect(routes.CategoryController.list)
-            case Some(_) => Redirect(routes.CategoryController.list) //500errorに置き換え
+          old match {
+            case None => BadRequest("Invalid id")   //category(id)のremoveに失敗
+            case Some(value) => {
+              results.find(_ == None) match {
+                case None => Redirect(routes.CategoryController.list) //成功
+                case Some(_) => InternalServerError("Some todo may be uncorrect category") //todoのcategory更新に失敗
+              }
+            }
           }
         }
-        
-        //CategoryControllerでtodoTable操作してしまってるのが良く無いかも
       }
-      case None     => Future.successful(BadRequest("Invalid id"))
+      case None     => Future.successful(BadRequest("Invalid id")) //リクエストにidが含まれていない
     }
   }
 }
