@@ -8,3 +8,7 @@ target
 .metals
 /RUNNING_PID
 docker/db/data/
+.bloop/
+*/.bloop/
+.vscode/
+*/.vscode/

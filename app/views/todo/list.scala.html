@@ -1,0 +1,39 @@
+@*
+* todo一覧のページ
+*@
+
+@import lib.model.Todo
+@import lib.model.Category
+@import helper._
+@(todos: Seq[Todo], categorys: Seq[Category], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+
+@common.Default(vv){
+<a href="@routes.TodoController.register" class="link_button">新規作成</a>
+<a href="@routes.CategoryController.list" class="link_button">カテゴリー</a>
+<ul id="todo_list">
+    @for(todo <- todos){
+        @*
+        *どう表示するかは後で考える
+        *@
+        <li><div class="todoPanel" style="background-color: @(categorys.find(_.id.get == todo.category).getOrElse(Category(None, "ERROR", "error", Category.ColorStatus.GRAY)).color.name)">
+            <a href="@routes.TodoController.edit(todo.id.get)">
+                <div>
+                    <h3>@todo.title</h3>
+                    <p>@todo.content</p>
+                    <div>
+                        <p>@categorys.find(_.id.get == todo.category).getOrElse(Category(None, "ERROR", "error", Category.ColorStatus.GRAY)).name</p>
+                        <p>
+                            @(todo.state.name)
+                        </p>
+                        @helper.form(action = routes.TodoController.delete()){
+                        @helper.CSRF.formField
+                        <input type="hidden" value="@todo.id" name="id">
+                        <input type="submit" value="削除">
+                    </div>
+                </div>
+            </a>
+        </div></li>
+        }
+    }
+</ul>
+}

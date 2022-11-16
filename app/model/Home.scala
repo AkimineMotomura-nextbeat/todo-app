@@ -13,3 +13,16 @@ case class ViewValueHome(
   jsSrc:  Seq[String],
 ) extends ViewValueCommon
 
+object ViewValueHome {
+  val vv_list = ViewValueHome(
+      title  = "Category list",
+      cssSrc = Seq("main.css", "list.css"),
+      jsSrc  = Seq("main.js")
+    )
+
+  val vv_edit = ViewValueHome(
+      title  = "",
+      cssSrc = Seq("main.css", "editor.css"),
+      jsSrc  = Seq("main.js")
+  )
+}
