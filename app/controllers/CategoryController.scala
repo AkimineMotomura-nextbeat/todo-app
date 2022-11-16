@@ -44,14 +44,13 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
   
   def edit(id: Long) = Action async { implicit req =>
     for {
-      category_seq <- categoryRepos.all
+      category_opt <- categoryRepos.get(Category.Id(id))
     }yield {
-      val category_opt = category_seq.find(_.id == id)
       
       category_opt match {
         case Some(category) => {
           val filledForm = CategoryFormData.apply(category)
-          Ok(views.html.todo.category.editor(category.id, category_seq.map(_.v), filledForm, ViewValueHome.vv_edit))
+          Ok(views.html.todo.category.editor(category.id, filledForm, ViewValueHome.vv_edit))
         }
         case None       => NotFound(views.html.error.page404())
       }
@@ -80,7 +79,7 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
         for {
             category_seq <- categoryRepos.all
         } yield {
-            BadRequest(views.html.todo.category.editor(id, category_seq.map(_.v), formWithErrors, ViewValueHome.vv_edit))
+            BadRequest(views.html.todo.category.editor(id, formWithErrors, ViewValueHome.vv_edit))
         }
       },
 
@@ -146,26 +145,34 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
     } yield (id)
 
     id match {
+      case Some(Category.noCategory_id) => Future.successful(BadRequest("Invalid id")) //noCategoryは削除不可
       case Some(id) => {
-        val t = todoRepos.getByCategoryId(Category.Id(id))
         for {
-          old <- categoryRepos.remove(Category.Id(id))
-          todo_list <- t
-          results <- old match {
-            case None => Future.successful(Seq.empty)
-            case Some(value) => {
-              Future.sequence(todo_list.map( todo => 
-                todoRepos.update(todo.map(_.copy(category=Category.Id(6)))) //category(6): noCateogry
-              ))
+          old_opt <- categoryRepos.remove(Category.Id(id))
+          noCategory_opt <- categoryRepos.get(Category.noCategory_id)
+
+          results <- old_opt match {
+            case None         => Future.successful(Seq.empty)
+            case Some(old)  => { 
+              noCategory_opt match {
+                case None => Future.successful(Seq.empty)
+                case Some(noCategory) => todoRepos.updateCategory(old, noCategory)
+              }
             }
           }
         } yield {
-          old match {
+          old_opt match {
             case None => BadRequest("Invalid id")   //category(id)のremoveに失敗
-            case Some(value) => {
-              results.find(_ == None) match {
-                case None => Redirect(routes.CategoryController.list) //成功
-                case Some(_) => InternalServerError("Some todo may be uncorrect category") //todoのcategory更新に失敗
+            case Some(old) => {
+              noCategory_opt match {
+                case None => InternalServerError("Some todo may be uncorrect category") //何故かnoCategoryが削除されていた場合
+                case Some(noCategory) => {
+                  results.isEmpty match {
+                    case true   => Redirect(routes.CategoryController.list) //成功
+                    case false  => Redirect(routes.CategoryController.list) //成功
+                  }
+                  //resultsを評価したいがFuture.onFailure以外は全て成功
+                }
               }
             }
           }

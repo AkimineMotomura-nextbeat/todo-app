@@ -47,6 +47,18 @@ case class TodoRepository[P <: JdbcProfile]()(implicit val driver: P)
       } yield old
     }
 
+  def updateCategory(category_old: Category.EmbeddedId, category_new: Category.EmbeddedId): Future[Seq[Category.Id]] =
+    RunDBAction(TodoTable) { slick =>
+      val row = slick.filter(_.category === category_old.id).map(_.category)
+      for {
+        old <- row.result
+        _ <- old.isEmpty match {
+          case true   => DBIO.successful(0)
+          case false  => row.update(category_new.id)
+        }
+      } yield old
+    }
+
   def remove(id: Id): Future[Option[EntityEmbeddedId]] =
     RunDBAction(TodoTable) {slick =>
       val row = slick.filter(_.id === id)

@@ -35,5 +35,5 @@ object TodoFormData {
     form.fill(TodoFormData(todo.v.title, todo.v.content, todo.v.category, todo.v.state))
 
   def init_form: Form[TodoFormData] = 
-    form.fill(TodoFormData("", "", Category.Id(6), Todo.Status.UNTOUCHED))
+    form.fill(TodoFormData("", "", Category.noCategory_id, Todo.Status.UNTOUCHED))
 }

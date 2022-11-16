@@ -21,6 +21,8 @@ object Category {
     type WithNoId = Entity.WithNoId[Id, Category]
     type EmbeddedId = Entity.EmbeddedId[Id, Category]
 
+    val noCategory_id = Category.Id(6)
+
     sealed abstract class ColorStatus(val code: Short, val name: String) extends EnumStatus
     object ColorStatus extends EnumStatus.Of[ColorStatus] {
         case object GRAY extends ColorStatus(code = 0, name = "gray")

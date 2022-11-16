@@ -17,12 +17,7 @@
         @inputText(form("slug"), '_label -> "slug")
         @select(
             field = form("color.color"), 
-            options = Seq(
-                "0" -> "gray", 
-                "1" -> "blue",
-                "2" -> "red",
-                "3" -> "green"
-            ),
+            options = Category.ColorStatus.values.map(color => color.code.toString -> color.toString),
             '_label -> "色設定"
         )
         <input type="submit" value="登録">

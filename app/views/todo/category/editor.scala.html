@@ -5,7 +5,7 @@
 @import helper._
 @import controllers.CategoryFormData
 @import lib.model.Category
-@(id: Long, categorys: Seq[Category], form: Form[CategoryFormData], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+@(id: Long, form: Form[CategoryFormData], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @common.Default(vv){
     <h2>編集画面</h2>
