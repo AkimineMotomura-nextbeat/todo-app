@@ -151,7 +151,7 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
           old_opt <- categoryRepos.remove(Category.Id(id))
           noCategory_opt <- categoryRepos.get(Category.noCategory_id)
 
-          results <- old_opt match {
+          _ <- old_opt match {
             case None         => Future.successful(Seq.empty)
             case Some(old)  => { 
               noCategory_opt match {
@@ -167,11 +167,7 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
               noCategory_opt match {
                 case None => InternalServerError("Some todo may be uncorrect category") //何故かnoCategoryが削除されていた場合
                 case Some(noCategory) => {
-                  results.isEmpty match {
-                    case true   => Redirect(routes.CategoryController.list) //成功
-                    case false  => Redirect(routes.CategoryController.list) //成功
-                  }
-                  //resultsを評価したいがFuture.onFailure以外は全て成功
+                  Redirect(routes.CategoryController.list) //成功
                 }
               }
             }
