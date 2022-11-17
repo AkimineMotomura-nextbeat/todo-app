@@ -12,3 +12,5 @@ docker/db/data/
 */.bloop/
 .vscode/
 */.vscode/
+node_modules
+.angular

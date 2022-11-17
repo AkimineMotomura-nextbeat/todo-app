@@ -1,0 +1,17 @@
+<p>
+  <a routerLink="/todo/new" class="link_button">新規作成</a>
+  <a routerLink="/todo/category/list" class="link_button">カテゴリー</a>
+</p>
+
+<ul id="todo_list">
+  <li *ngFor="let todo of todoList">
+    <div class="todoPanel">
+      <a routerLink="/todo/{{todo.id}}">
+        <h3>{{todo.title}}</h3>
+        <p>{{todo.content}}</p>
+      </a>
+      <button type="button" class="delete" title="delete todo"
+      (click)="delete(todo)">X</button>
+    </div>
+  </li>
+</ul>
