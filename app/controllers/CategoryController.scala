@@ -97,8 +97,10 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
   */
   def store() = Action(parse.json) async {implicit req =>
     req.body.validate[JsValueCreateCategory].fold(
+      //パースと変換がうまくいかなかった時
       error => {
         //TODO: どうするのが良いか考える
+        println(req.body.toString())
         Future.successful(BadRequest("Request data is unacceptable"))
       },
       categoryData => {

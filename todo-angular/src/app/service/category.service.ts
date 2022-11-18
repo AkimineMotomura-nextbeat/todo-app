@@ -5,6 +5,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs';
 
 import { Category } from '../models/category';
+import { CategoryColor } from '../models/color';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class CategoryService {
 
   constructor(private http: HttpClient) { }
 
+  /** カテゴリの一覧を取得 */
   getCategoryList(): Observable<Category[]> {
     return this.http.get<Category[]>(this.categoryUrl).pipe(
       catchError(this.handleError<Category[]>('getCategoryList', []))
@@ -31,6 +33,15 @@ export class CategoryService {
       tap(_ => this.log(`fetched category id=${id}`)),
       catchError(this.handleError<Category>(`getCategory id=${id}`))
     );
+  }
+
+  /** カテゴリカラーの一覧を取得 */
+  getCategoryColorList(): Observable<CategoryColor[]> {
+    const url = `${this.categoryUrl}/color`;
+    return this.http.get<CategoryColor[]>(url).pipe(
+      tap(_ => this.log(`fetched category color list`)),
+      catchError(this.handleError<CategoryColor[]>(`getCategoryColorList`, []))
+    )
   }
 
   /* 検索語を含むヒーローを取得する */

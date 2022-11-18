@@ -12,9 +12,9 @@ GET     /api/todo                             controllers.TodoController.list
 # 個別
 GET     /api/todo/$id<[0-9]+>                 controllers.TodoController.get(id: Long)
 # 新規作成のPOST先
-PUT     /api/todo                             controllers.TodoController.store
+POST    /api/todo                             controllers.TodoController.store
 # 編集後のPOST先
-POST    /api/todo/$id<[0-9]+>                 controllers.TodoController.update(id: Long)
+PUT     /api/todo/$id<[0-9]+>                 controllers.TodoController.update(id: Long)
 # DELETE
 DELETE  /api/todo/$id<[0-9]+>                 controllers.TodoController.delete(id: Long)
 
@@ -24,9 +24,10 @@ GET     /api/todo/category                    controllers.CategoryController.lis
 # 個別
 GET     /api/todo/category/$id<[0-9]+>        controllers.CategoryController.get(id: Long)
 # 新規作成のPOST先
-PUT     /api/todo/category                    controllers.CategoryController.store
++nocsrf
+POST    /api/todo/category                    controllers.CategoryController.store
 # 編集後のPOST先
-POST    /api/todo/category/$id<[0-9]+>        controllers.CategoryController.update(id: Long)
+PUT     /api/todo/category/$id<[0-9]+>        controllers.CategoryController.update(id: Long)
 # DELETE
 DELETE  /api/todo/category/$id<[0-9]+>        controllers.CategoryController.delete(id: Long)
 

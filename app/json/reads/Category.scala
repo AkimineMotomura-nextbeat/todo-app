@@ -3,6 +3,7 @@ package json.reads
 import play.api.libs.json.{Json, Reads}
 
 case class JsValueCreateCategory(
+  id: Long,
   name: String,
   slug: String,
   color: Short
