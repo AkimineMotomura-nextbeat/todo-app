@@ -1,0 +1,18 @@
+<div *ngIf="category">
+
+  <h2>{{category.name | uppercase}} Details</h2>
+  <div>
+    <label for="category_name">Category name: </label>
+    <input id="category_name" [(ngModel)]="category.name" placeholder="name">
+  </div>
+  <div>
+    <label for="category_slug">Category slug: </label>
+    <input id="category_slug" [(ngModel)]="category.slug" placeholder="slug">
+  </div>
+  <div>
+    <label for="category_color">Category color: </label>
+    <input id="category_color" [(ngModel)]="category.color" placeholder="color">
+  </div>
+  <button type="button" (click)="goBack()">go back</button>
+  <button type="button" (click)="save()">save</button>
+</div>

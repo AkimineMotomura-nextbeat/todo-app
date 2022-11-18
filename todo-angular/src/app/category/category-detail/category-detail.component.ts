@@ -2,8 +2,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
-import { Category } from '../category';
-import { CategoryService } from '../category.service';
+import { Category } from '../../models/category';
+import { CategoryService } from '../../service/category.service';
 
 @Component({
   selector: 'app-category-detail',
@@ -21,10 +21,7 @@ export class CategoryDetailComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    //this.getCategory();
-
-    //TODO debug
-    this.category = {id: 1, name: "test1", slug: "test", color: 0}
+    this.getCategory();
   }
 
   goBack(): void {

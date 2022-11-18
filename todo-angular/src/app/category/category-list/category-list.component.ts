@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 
-import { Category } from '../category';
-import { CategoryService } from '../category.service';
+import { Category } from '../../models/category';
+import { CategoryService } from '../../service/category.service';
 
 @Component({
   selector: 'app-category-list',
@@ -19,18 +19,7 @@ export class CategoryListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    //this.getCategoryList();
-
-    this.categoryList = [
-      {id: 1, name: "test1", slug: "test", color: 0},
-      {id: 2, name: "test2", slug: "test", color: 0},
-      {id: 3, name: "test3", slug: "test", color: 0},
-      {id: 4, name: "test4", slug: "test", color: 0},
-      {id: 5, name: "test5", slug: "test", color: 0},
-      {id: 6, name: "test6", slug: "test", color: 0},
-      {id: 7, name: "test7", slug: "test", color: 0},
-      {id: 8, name: "test8", slug: "test", color: 0},
-    ]
+    this.getCategoryList();
   }
 
   getCategoryList(): void {

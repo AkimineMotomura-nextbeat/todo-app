@@ -17,12 +17,15 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation._
 import play.api.data.validation.Constraints._
+import play.api.libs.json.Json
 import slick.jdbc.JdbcProfile
 
 import com.softwaremill.macwire
 
 import model.ViewValueHome
 import lib.model.Category
+import json.writes.JsValueCategory
+import json.reads.JsValueCreateCategory
 import lib.persistence._
 
 @Singleton
@@ -35,69 +38,54 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
   def list() = Action async { implicit req =>
     for {
       categorys <- categoryRepos.all
-    } yield Ok(views.html.todo.category.list(categorys.map(_.v), ViewValueHome.vv_list))
-  }
-
-  /**
-    * GET /todo/category/:id
-    */
-  
-  def edit(id: Long) = Action async { implicit req =>
-    for {
-      category_opt <- categoryRepos.get(Category.Id(id))
-    }yield {
-      
-      category_opt match {
-        case Some(category) => {
-          val filledForm = CategoryFormData.apply(category)
-          Ok(views.html.todo.category.editor(category.id, filledForm, ViewValueHome.vv_edit))
-        }
-        case None       => NotFound(views.html.error.page404())
-      }
+    } yield {
+      val jsValue = categorys.map(JsValueCategory.apply(_))
+      Ok(Json.toJson(jsValue))
     }
   }
 
   /**
-   * GET /todo/category/new
-  */
-  def register() = Action async {implicit req =>
-    for {
-        category_seq <- categoryRepos.all
+    * GET /api/todo/category/:id
+    *
+    * @param id
+    */
+  def get(id: Long) = Action async { implicit req =>
+    for{
+      category_opt <- categoryRepos.get(Category.Id(id))
     } yield {
-        Ok(views.html.todo.category.register(category_seq.map(_.v), CategoryFormData.form, ViewValueHome.vv_edit))
+      category_opt match {
+        case None => NotFound("Invalid id")
+        case Some(category) => {
+          val jsValue = JsValueCategory.apply(category)
+          Ok(Json.toJson(jsValue))
+        }
+      }
     }
   }
 
   /**
     * POST /todo/category/:id/update
     */
-  def update(id: Long) = Action async { implicit request: Request[AnyContent] =>
-    CategoryFormData.form.bindFromRequest().fold(
-      // 処理が失敗した場合に呼び出される関数
-      // 処理失敗の例: バリデーションエラー
-      (formWithErrors: Form[CategoryFormData]) => {
-        for {
-            category_seq <- categoryRepos.all
-        } yield {
-            BadRequest(views.html.todo.category.editor(id, formWithErrors, ViewValueHome.vv_edit))
-        }
+  def update(id: Long) = Action(parse.json) async { implicit request =>
+    request.body.validate[JsValueCreateCategory].fold(
+      errors => {
+        //TODO: どうするのが良いか考える
+        Future.successful(BadRequest("Request data is unacceptable"))
       },
-
-      // 処理が成功した場合に呼び出される関数
-      (categoryFormData: CategoryFormData) => {
+      categoryData => {
         //DBのデータをupdate
         for {
           category_old <- categoryRepos.get(Category.Id(id))
           response <- category_old match {
             case None => Future.successful(None)
-            case Some(category) => categoryRepos.update(category.map(_.copy(  name=categoryFormData.name, 
-                                                                              slug=categoryFormData.slug,
-                                                                              color=categoryFormData.color)))
+            case Some(category) => categoryRepos.update(category.map(_.copy(  name=categoryData.name, 
+                                                                              slug=categoryData.slug,
+                                                                              color=Category.ColorStatus.apply(categoryData.color))))
           }
         } yield {
           response match {
-            case Some(_)  => Redirect(routes.CategoryController.list) //成功
-            case None     => NotFound(views.html.error.page404()) //category(id)が存在しないため更新不可
+            case None     => BadRequest("Requested category is not exist") //category(id)が存在しないため更新不可
+            case Some(_)  => Ok("updated successfully") //成功
           }
         }
       }
@@ -107,26 +95,19 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
   /**
    * POST /todo/category/new
   */
-  def store() = Action async {implicit req =>
-    CategoryFormData.form.bindFromRequest().fold(
-      // 処理が失敗した場合に呼び出される関数
-      // 処理失敗の例: バリデーションエラー
-      (formWithErrors: Form[CategoryFormData]) => {
-        for {
-          categorys <- categoryRepos.all
-        } yield {
-          BadRequest(views.html.todo.category.register(categorys.map(_.v), formWithErrors, ViewValueHome.vv_edit))
-        }
+  def store() = Action(parse.json) async {implicit req =>
+    req.body.validate[JsValueCreateCategory].fold(
+      error => {
+        //TODO: どうするのが良いか考える
+        Future.successful(BadRequest("Request data is unacceptable"))
       },
-
-      // 処理が成功した場合に呼び出される関数
-      (categoryFormData: CategoryFormData) => {
+      categoryData => {
         //DBに追加
-        val category_new = Category.apply(categoryFormData.name, categoryFormData.slug, color=categoryFormData.color)
+        val category_new = Category.apply(categoryData.name, categoryData.slug, color=Category.ColorStatus.apply(categoryData.color))
         for {
           id <- categoryRepos.add(category_new)
         } yield {
-          Redirect(routes.CategoryController.list)
+          Ok("Stored successfully")
         }
       }
     )
@@ -135,18 +116,10 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
   /**
    * POST   /todo/category/delete
    */
-  def delete() = Action async { implicit request: Request[AnyContent] =>
-    // requestから直接値を取得する
-    val id = for {
-      body_map <- request.body.asFormUrlEncoded
-      id_str_opt <- body_map.get("id")
-      id_str <- id_str_opt.headOption
-      id <- Try { id_str.toLong } toOption
-    } yield (id)
-
+  def delete(id: Long) = Action async { implicit request: Request[AnyContent] =>
     id match {
-      case Some(Category.noCategory_id) => Future.successful(BadRequest("Invalid id")) //noCategoryは削除不可
-      case Some(id) => {
+      case Category.noCategory_id => Future.successful(BadRequest("Invalid id")) //noCategoryは削除不可
+      case id => {
         for {
           old_opt <- categoryRepos.remove(Category.Id(id))
           noCategory_opt <- categoryRepos.get(Category.noCategory_id)
@@ -167,14 +140,13 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
               noCategory_opt match {
                 case None => InternalServerError("Some todo may be uncorrect category") //何故かnoCategoryが削除されていた場合
                 case Some(noCategory) => {
-                  Redirect(routes.CategoryController.list) //成功
+                  Ok("deleted successfully") //成功
                 }
               }
             }
           }
         }
       }
-      case None     => Future.successful(BadRequest("Invalid id")) //リクエストにidが含まれていない
     }
   }
 }

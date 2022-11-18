@@ -4,7 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs';
 
-import { Todo } from './todo';
+import { Todo } from '../models/todo';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +15,6 @@ export class TodoService {
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
-
-
 
   constructor(private http: HttpClient) { }
 

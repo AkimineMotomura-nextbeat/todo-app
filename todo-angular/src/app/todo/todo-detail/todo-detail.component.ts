@@ -2,8 +2,8 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
-import { Todo } from '../todo';
-import { TodoService } from '../todo.service';
+import { Todo } from '../../models/todo';
+import { TodoService } from '../../service/todo.service';
 
 @Component({
   selector: 'app-category-detail',
@@ -21,10 +21,7 @@ export class TodoDetailComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    //this.getTodo();
-
-    //TODO debug
-    this.todo = { id: 1, category: 1, title: 'Test1', content: 'hogehoge', state: 0}
+    this.getTodo();
   }
 
   goBack(): void {

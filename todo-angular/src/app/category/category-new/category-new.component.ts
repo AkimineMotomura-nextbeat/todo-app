@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
-import { Category } from '../category';
-import { CategoryService } from '../category.service';
+import { Category } from '../../models/category';
+import { CategoryService } from '../../service/category.service';
 
 @Component({
   selector: 'app-category-new',
