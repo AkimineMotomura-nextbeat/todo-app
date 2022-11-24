@@ -23,12 +23,15 @@ DELETE  /api/todo/$id<[0-9]+>                 controllers.TodoController.delete(
 GET     /api/todo/category                    controllers.CategoryController.list
 # 個別
 GET     /api/todo/category/$id<[0-9]+>        controllers.CategoryController.get(id: Long)
+#色一覧
+GET     /api/todo/category/color              controllers.CategoryController.colorList
 # 新規作成のPOST先
 +nocsrf
 POST    /api/todo/category                    controllers.CategoryController.store
 # 編集後のPOST先
 PUT     /api/todo/category/$id<[0-9]+>        controllers.CategoryController.update(id: Long)
 # DELETE
++nocsrf
 DELETE  /api/todo/category/$id<[0-9]+>        controllers.CategoryController.delete(id: Long)
 
 # Map static resources from the /public folder to the /assets URL path

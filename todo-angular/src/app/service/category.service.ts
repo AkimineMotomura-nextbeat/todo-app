@@ -60,7 +60,8 @@ export class CategoryService {
 
   /** POST: サーバーに新しいCategoryを登録する */
   addCategory(category: Category): Observable<Category> {
-    return this.http.post<Category>(this.categoryUrl, category, this.httpOptions).pipe(
+    console.log(category)
+    return this.http.post<Category>(this.categoryUrl, JSON.stringify(category), this.httpOptions).pipe(
       tap((newCategory: Category) => this.log(`added category w/ id=${newCategory.id}`)),
       catchError(this.handleError<Category>('addCategory'))
     );

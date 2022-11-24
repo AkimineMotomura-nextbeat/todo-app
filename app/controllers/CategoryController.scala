@@ -26,6 +26,7 @@ import model.ViewValueHome
 import lib.model.Category
 import json.writes.JsValueCategory
 import json.reads.JsValueCreateCategory
+import json.writes.JsValueColor
 import lib.persistence._
 
 @Singleton
@@ -39,7 +40,7 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
     for {
       categorys <- categoryRepos.all
     } yield {
-      val jsValue = categorys.map(JsValueCategory.apply(_))
+      val jsValue = categorys.filter(_.id != Category.noCategory_id).map(JsValueCategory.apply(_))
       Ok(Json.toJson(jsValue))
     }
   }
@@ -61,6 +62,14 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
         }
       }
     }
+  }
+  
+  /**
+    * GET /api/todo/category/color
+    */
+  def colorList() = Action { implicit req =>
+    val jsValue = Category.ColorStatus.values.map(JsValueColor.apply(_))
+    Ok(Json.toJson(jsValue))
   }
 
   /**

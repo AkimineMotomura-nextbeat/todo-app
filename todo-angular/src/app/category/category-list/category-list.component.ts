@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, createPlatform, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 
 import { Category } from '../../models/category';
+import { CategoryColor } from 'src/app/models/color';
 import { CategoryService } from '../../service/category.service';
 
 @Component({
@@ -12,6 +13,7 @@ import { CategoryService } from '../../service/category.service';
 export class CategoryListComponent implements OnInit {
 
   categoryList: Category[] = [];
+  colorList: CategoryColor[] = [];
 
   constructor(
     private location        : Location,
@@ -20,12 +22,27 @@ export class CategoryListComponent implements OnInit {
 
   ngOnInit(): void {
     this.getCategoryList();
+    this.getColorList();
   }
 
   getCategoryList(): void {
     this.categoryService.getCategoryList().subscribe(
       categoryList => this.categoryList = categoryList
     )
+  }
+
+  getColorList(): void {
+    this.categoryService.getCategoryColorList().subscribe(
+      colorList => this.colorList = colorList
+    )
+  }
+
+  getColorCode(id: number): string {
+    var colorCode = "#eee";
+    let color = this.colorList.find(_ => _.id == id);
+    if(color) colorCode = color.colorCode;
+
+    return colorCode;
   }
 
   /*

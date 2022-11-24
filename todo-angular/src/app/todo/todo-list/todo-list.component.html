@@ -5,7 +5,7 @@
 
 <ul id="todo_list">
   <li *ngFor="let todo of todoList">
-    <div class="todoPanel">
+    <div class="todoPanel" style="background-color: {{this.getColorCode(this.getCategoryColor(todo.category))}};">
       <a routerLink="/todo/{{todo.id}}">
         <h3>{{todo.title}}</h3>
         <p>{{todo.content}}</p>

@@ -26,20 +26,12 @@ export class CategoryNewComponent implements OnInit {
     this.categoryForm = new FormGroup({
       name  : new FormControl('', Validators.required),
       slug  : new FormControl(''),
-      color : new FormControl('')
+      color : new FormControl(0)
     })
   }
 
   ngOnInit(): void {
-    //this.getCategoryColorList();
-
-    //TODO debug
-    this.categoryColorList = [
-      {id: 0, name: "BLACK", colorCode: "#000"},
-      {id: 1, name: "RED", colorCode: "#F00"},
-      {id: 3, name: "GREEN", colorCode: "#0F0"},
-      {id: 2, name: "BLUE", colorCode: "#00F"},
-    ]
+    this.getCategoryColorList();
   }
 
   getCategoryColorList(): void {

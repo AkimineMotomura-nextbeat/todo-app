@@ -23,12 +23,12 @@ object Category {
 
     val noCategory_id = Category.Id(6)
 
-    sealed abstract class ColorStatus(val code: Short, val name: String) extends EnumStatus
+    sealed abstract class ColorStatus(val code: Short, val name: String, val colorCode: String) extends EnumStatus
     object ColorStatus extends EnumStatus.Of[ColorStatus] {
-        case object GRAY extends ColorStatus(code = 0, name = "gray")
-        case object BLUE extends ColorStatus(code = 1, name = "royalblue")
-        case object RED extends ColorStatus(code = 2, name = "tomato")
-        case object GREEN extends ColorStatus(code = 3, name = "seagreen")
+        case object GRAY extends ColorStatus(code = 0, name = "GRAY", colorCode = "gray")
+        case object BLUE extends ColorStatus(code = 1, name = "BLUE", colorCode = "royalblue")
+        case object RED extends ColorStatus(code = 2, name = "RED", colorCode = "tomato")
+        case object GREEN extends ColorStatus(code = 3, name = "GREEN", colorCode = "seagreen")
     }
 
 

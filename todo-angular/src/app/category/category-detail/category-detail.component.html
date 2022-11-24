@@ -1,14 +1,40 @@
-<div *ngIf="category">
+<h2>カテゴリ詳細編集</h2>
 
-  <h2>{{category.name | uppercase}} Details</h2>
-  <div>
-    <label for="category_name">Category name: </label>
-    <input id="category_name" [(ngModel)]="category.name" placeholder="name">
-  </div>
-  <div>
-    <label for="category_slug">Category slug: </label>
-    <input id="category_slug" [(ngModel)]="category.slug" placeholder="slug">
-  </div>
-  <button type="button" (click)="goBack()">go back</button>
-  <button type="button" (click)="save()">save</button>
-</div>
+<form [formGroup]="categoryForm">
+  <dl>
+    <dt>
+      カテゴリ名
+    </dt>
+    <dd>
+      <input formControlName="name">
+      <div *ngIf="nameForm.invalid && (nameForm.dirty || nameForm.touched)">
+        <div *ngIf="nameForm.errors?.['required']">
+          カテゴリ名を入力してください。
+        </div>
+      </div>
+    </dd>
+  </dl>
+  <dl>
+    <dt>
+      略称
+    </dt>
+    <dd>
+      <input formControlName="slug">
+    </dd>
+  </dl>
+  <dl>
+    <dt>
+      カテゴリカラー
+    </dt>
+    <dd>
+      <select formControlName="color">
+        <option *ngFor="let color of categoryColorList" [value]="color.id">
+          {{color.name}}
+        </option>
+      </select>
+    </dd>
+  </dl>
+</form>
+
+<button type="button" (click)="goBack()">go back</button>
+<button type="button" (click)="save()">save</button>
