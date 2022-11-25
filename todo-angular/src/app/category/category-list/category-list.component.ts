@@ -45,17 +45,6 @@ export class CategoryListComponent implements OnInit {
     return colorCode;
   }
 
-  /*
-  add(name: string): void {
-    name = name.trim();
-    if (!name) { return; }
-    this.heroService.addHero({ name } as Hero)
-      .subscribe(hero => {
-        this.heroes.push(hero);
-      });
-  }
-  */
-
   delete(category: Category): void {
     this.categoryList = this.categoryList.filter(t => t !== category);
     this.categoryService.deleteCategory(category.id).subscribe();

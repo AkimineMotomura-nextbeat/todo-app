@@ -1,5 +1,39 @@
 # TodoAngular
 
+## version
+Node.js version v19.1.0 detected.
+Odd numbered Node.js versions will not enter LTS status and should not be used for production. For more information, please see https://nodejs.org/en/about/releases/.
+
+     _                      _                 ____ _     ___
+    / \   _ __   __ _ _   _| | __ _ _ __     / ___| |   |_ _|
+   / △ \ | '_ \ / _` | | | | |/ _` | '__|   | |   | |    | |
+  / ___ \| | | | (_| | |_| | | (_| | |      | |___| |___ | |
+ /_/   \_\_| |_|\__, |\__,_|_|\__,_|_|       \____|_____|___|
+                |___/
+    
+
+Angular CLI: 14.2.9
+Node: 19.1.0 (Unsupported)
+Package Manager: npm 9.1.1 
+OS: darwin x64
+
+Angular: 14.2.11
+... animations, common, compiler, compiler-cli, core, forms
+... platform-browser, platform-browser-dynamic, router
+
+Package                         Version
+---------------------------------------------------------
+@angular-devkit/architect       0.1402.9
+@angular-devkit/build-angular   14.2.9
+@angular-devkit/core            14.2.9
+@angular-devkit/schematics      14.2.9
+@angular/cli                    14.2.9
+@angular/material               7.0.0
+@schematics/angular             14.2.9
+rxjs                            7.5.7
+typescript                      4.7.4
+
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.9.
 
 ## Development server

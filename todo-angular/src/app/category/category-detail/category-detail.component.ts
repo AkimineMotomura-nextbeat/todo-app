@@ -27,7 +27,7 @@ export class CategoryDetailComponent implements OnInit {
   ) {
     this.categoryForm = new FormGroup({
       name  : new FormControl('', Validators.required),
-      slug  : new FormControl(''),
+      slug  : new FormControl('', Validators.pattern('[a-zA-Z0-9]+')),
       color : new FormControl(0)
     })
   }
@@ -50,7 +50,6 @@ export class CategoryDetailComponent implements OnInit {
         slug:   this.category.slug,
         color:  this.category.color
       })
-      console.log('x')
     })
   }
 
@@ -61,7 +60,7 @@ export class CategoryDetailComponent implements OnInit {
   }
 
   save(): void {
-    if (this.category) {
+    if (this.category && !this.nameForm.invalid && !this.slugForm.invalid) {
       this.categoryService.updateCategory({
         id    : this.category.id,
         name  : this.nameForm.value,

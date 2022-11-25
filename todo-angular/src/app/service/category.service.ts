@@ -44,20 +44,6 @@ export class CategoryService {
     )
   }
 
-  /* 検索語を含むヒーローを取得する */
-  /*
-  searchCategory(term: string): Observable<Category[]> {
-    if (!term.trim()) {
-      // 検索語がない場合、空のヒーロー配列を返す
-      return of([]);
-    }
-    return this.http.get<Category[]>(`${this.categoryUrl}/?name=${term}`).pipe(
-      tap(_ => this.log(`found category matching "${term}"`)),
-      catchError(this.handleError<Category[]>('searchCategory', []))
-    );
-  }
-  */
-
   /** POST: サーバーに新しいCategoryを登録する */
   addCategory(category: Category): Observable<Category> {
     this.setCsrfToken();
@@ -68,7 +54,7 @@ export class CategoryService {
     );
   }
 
-  /** PUT: サーバー上でヒーローを更新 */
+  /** PUT: サーバー上でCategoryを更新 */
   updateCategory(category: Category): Observable<any> {
     this.setCsrfToken();
     const url = `${this.categoryUrl}/${category.id}`
@@ -79,7 +65,7 @@ export class CategoryService {
     );
   }
 
-  /** DELETE: サーバーからヒーローを削除 */
+  /** DELETE: サーバーからCategoryを削除 */
   deleteCategory(id: number): Observable<Category> {
     this.setCsrfToken();
     const url = `${this.categoryUrl}/${id}`;
@@ -90,6 +76,7 @@ export class CategoryService {
     );
   }
 
+  /** csrfトークンをcookieから取得してhttpヘッダに設定 */
   setCsrfToken(): void {
     const csrfToken = document.cookie.match(new RegExp('(^|)' + 'csrf_token' + '=([^;]+)'));
     if(csrfToken) {

@@ -18,8 +18,8 @@
   font-weight:       bold;
 }
 
-.main {
-  width:      980px;
+main {
+  width:      70vw;
   margin:     100px auto;
   padding:    100px;
   box-shadow: 0 0 4px gray;

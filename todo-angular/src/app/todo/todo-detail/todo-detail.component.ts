@@ -32,7 +32,7 @@ export class TodoDetailComponent implements OnInit {
     this.todoForm = new FormGroup({
       title     : new FormControl('', Validators.required),
       content   : new FormControl(''),
-      category  : new FormControl(0, Validators.required),
+      category  : new FormControl(6, Validators.required),
       state     : new FormControl(0)
     })
   }
@@ -73,7 +73,7 @@ export class TodoDetailComponent implements OnInit {
   }
 
   save(): void {
-    if (this.todo) {
+    if (this.todo && !this.titleForm.invalid) {
       this.todoService.updateTodo({
         id        : this.todo.id,
         category  : Number(this.categoryForm.value),

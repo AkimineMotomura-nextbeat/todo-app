@@ -73,12 +73,11 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
   }
 
   /**
-    * POST /todo/category/:id/update
+    * PUT /apitodo/category/:id
     */
   def update(id: Long) = Action(parse.json) async { implicit request =>
     request.body.validate[JsValueCreateCategory].fold(
       errors => {
-        //TODO: Logに書き込む等
         Future.successful(BadRequest("Request data is unacceptable"))
       },
       categoryData => {
@@ -106,13 +105,12 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
   }
 
   /**
-   * POST /todo/category/new
+   * POST /api/todo/category
   */
   def store() = Action(parse.json) async {implicit req =>
     req.body.validate[JsValueCreateCategory].fold(
       //パースと変換がうまくいかなかった時
       error => {
-        //TODO: どうするのが良いか考える
         println(req.body.toString())
         Future.successful(BadRequest("Request data is unacceptable"))
       },
@@ -129,7 +127,7 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
   }
 
   /**
-   * POST   /todo/category/delete
+   * DELETE   /api/todo/category/:id
    */
   def delete(id: Long) = Action async { implicit request: Request[AnyContent] =>
     id match {

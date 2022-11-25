@@ -51,7 +51,6 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents, v
     * GET /api/todo/:id
     *
     * @param id
-    * @return
     */
   def get(id: Long) = Action async { implicit req =>
     for{
@@ -67,19 +66,21 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents, v
     }
   }
 
+  /**
+    * GET   /api/todo/state
+    */
   def todoState() = Action { implicit req =>
     val jsValue = Todo.Status.values.map(JsValueStatus.apply(_))
     Ok(Json.toJson(jsValue))
   }
 
   /**
-    * POST /api/todo/:id/update
+    * PUT /api/todo/:id
     */
   def update(id: Long) = Action(parse.json) async { implicit request =>
     request.body.validate[JsValueCreateTodo].fold(
       //パースと変換がうまくいかなかった時
       errors => {
-        //TODO: どうするのが良いか考える
         Future.successful(BadRequest("Request data is unacceptable"))
       },
       //うまく行った時
@@ -113,13 +114,12 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents, v
   }
 
   /**
-   * POST /api/todo/new
+   * POST /api/todo
   */
   def store() = Action(parse.json) async {implicit req =>
     req.body.validate[JsValueCreateTodo].fold(
       //パースと変換がうまくいかなかった時
       errors => {
-        //TODO: どうするのがいいか考える
         Future.successful(BadRequest("Request data is unacceptable"))
       },
       //うまく行った時
@@ -143,7 +143,7 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents, v
   }
 
   /**
-   * 対象のデータを削除する
+   * DELETE   /api/todo/:id
    */
   def delete(id: Long) = Action async { implicit request: Request[AnyContent] =>
     for {

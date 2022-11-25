@@ -28,7 +28,7 @@ export class TodoNewComponent implements OnInit {
     this.todoForm = new FormGroup({
       title:    new FormControl('', Validators.required),
       content:  new FormControl(''),
-      category: new FormControl(0, Validators.required)
+      category: new FormControl(6)
     })
   }
 
@@ -47,14 +47,15 @@ export class TodoNewComponent implements OnInit {
   }
 
   save(): void {
-    this.todoService.addTodo({
-      id      : 0,
-      category: Number(this.categoryForm.value),
-      title   : this.titleForm.value,
-      content : this.contentForm.value,
-      state   : 0
-    })
-        .subscribe(() => this.goBack());
+    if(!this.titleForm.invalid){
+      this.todoService.addTodo({
+        id      : 0,
+        category: Number(this.categoryForm.value),
+        title   : this.titleForm.value,
+        content : this.contentForm.value,
+        state   : 0
+      }).subscribe(() => this.goBack());
+    }
   }
 
   get titleForm() {

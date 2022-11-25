@@ -25,7 +25,7 @@ export class CategoryNewComponent implements OnInit {
   ) { 
     this.categoryForm = new FormGroup({
       name  : new FormControl('', Validators.required),
-      slug  : new FormControl(''),
+      slug  : new FormControl('', Validators.pattern('[a-zA-Z0-9]+')),
       color : new FormControl(0)
     })
   }
@@ -45,12 +45,14 @@ export class CategoryNewComponent implements OnInit {
   }
 
   save(): void {
-    this.categoryService.addCategory({
-      id    : 0,
-      name  : this.nameForm.value,
-      slug  : this.slugForm.value,
-      color : Number(this.colorForm.value)
-    }).subscribe(() => this.goBack());
+    if(!this.nameForm.invalid && !this.slugForm.invalid){
+      this.categoryService.addCategory({
+        id    : 0,
+        name  : this.nameForm.value,
+        slug  : this.slugForm.value,
+        color : Number(this.colorForm.value)
+      }).subscribe(() => this.goBack());
+    }
   }
 
   get nameForm() {

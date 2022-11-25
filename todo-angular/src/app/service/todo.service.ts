@@ -22,6 +22,7 @@ export class TodoService {
 
   constructor(private http: HttpClient) { }
 
+  /** Todoの一覧を取得する */
   getTodoList(): Observable<Todo[]> {
     return this.http.get<Todo[]>(this.todoUrl).pipe(
       catchError(this.handleError<Todo[]>('getTodoList', []))
@@ -37,26 +38,13 @@ export class TodoService {
     );
   }
 
+  /** 進行状態の一覧を取得 */
   getTodoState(): Observable<TodoState[]> {
     const url= `${this.todoUrl}/state`
     return this.http.get<TodoState[]>(url).pipe(
       catchError(this.handleError<TodoState[]>('getTodoState', []))
     )
   }
-
-  /* 検索語を含むヒーローを取得する */
-  /*
-  searchTodo(term: string): Observable<Todo[]> {
-    if (!term.trim()) {
-      // 検索語がない場合、空のヒーロー配列を返す
-      return of([]);
-    }
-    return this.http.get<Todo[]>(`${this.todoUrl}/?name=${term}`).pipe(
-      tap(_ => this.log(`found todo matching "${term}"`)),
-      catchError(this.handleError<Todo[]>('searchTodo', []))
-    );
-  }
-  */
 
   /** POST: サーバーに新しいTodoを登録する */
   addTodo(todo: Todo): Observable<Todo> {
@@ -68,7 +56,7 @@ export class TodoService {
     );
   }
 
-  /** PUT: サーバー上でヒーローを更新 */
+  /** PUT: サーバー上でTodoを更新 */
   updateTodo(todo: Todo): Observable<any> {
     this.setCsrfToken();
     const url = `${this.todoUrl}/${todo.id}`
@@ -79,7 +67,7 @@ export class TodoService {
     );
   }
 
-  /** DELETE: サーバーからヒーローを削除 */
+  /** DELETE: サーバーからTodoを削除 */
   deleteTodo(id: number): Observable<Todo> {
     this.setCsrfToken();
     const url = `${this.todoUrl}/${id}`;
@@ -90,6 +78,7 @@ export class TodoService {
     );
   }
 
+  /** csrfトークンをcookieから取得してhttpヘッダに設定 */
   setCsrfToken(): void {
     const csrfToken = document.cookie.match(new RegExp('(^|)' + 'csrf_token' + '=([^;]+)'));
     if(csrfToken) {
