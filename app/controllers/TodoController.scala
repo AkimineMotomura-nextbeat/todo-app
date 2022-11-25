@@ -103,12 +103,10 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents, v
             }
           }
         } yield {
-          //TODO: 要調査
           response match {
             case None     => BadRequest("Requested todo or category is not exist")
             case Some(_)  => Ok("updated successfully")
           }
-          //Ok(ダミー)とか？
         }
       }
     )

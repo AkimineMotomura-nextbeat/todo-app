@@ -13,11 +13,10 @@ import { TodoState } from '../models/todoState';
 export class TodoService {
 
   private todoUrl = 'api/todo';
-  private csrfToken = '';
 
   httpOptions = {
     headers: new HttpHeaders({ 
-      'Content-Type': 'application/json'
+      'Content-Type'  : 'application/json'
     })
   };
 
@@ -61,6 +60,8 @@ export class TodoService {
 
   /** POST: サーバーに新しいTodoを登録する */
   addTodo(todo: Todo): Observable<Todo> {
+    this.setCsrfToken();
+
     return this.http.post<Todo>(this.todoUrl, todo, this.httpOptions).pipe(
       tap((newTodo: Todo) => this.log(`added todo w/ id=${newTodo.id}`)),
       catchError(this.handleError<Todo>('addTodo'))
@@ -69,7 +70,10 @@ export class TodoService {
 
   /** PUT: サーバー上でヒーローを更新 */
   updateTodo(todo: Todo): Observable<any> {
-    return this.http.put(this.todoUrl, todo, this.httpOptions).pipe(
+    this.setCsrfToken();
+    const url = `${this.todoUrl}/${todo.id}`
+
+    return this.http.put(url, todo, this.httpOptions).pipe(
       tap(_ => this.log(`update todo id=${todo.id}`)),
       catchError(this.handleError<any>('updateTodo'))
     );
@@ -77,12 +81,23 @@ export class TodoService {
 
   /** DELETE: サーバーからヒーローを削除 */
   deleteTodo(id: number): Observable<Todo> {
+    this.setCsrfToken();
     const url = `${this.todoUrl}/${id}`;
 
     return this.http.delete<Todo>(url, this.httpOptions).pipe(
       tap(_ => this.log(`deleted Todo id=${id}`)),
       catchError(this.handleError<Todo>('deleteTodo'))
     );
+  }
+
+  setCsrfToken(): void {
+    const csrfToken = document.cookie.match(new RegExp('(^|)' + 'csrf_token' + '=([^;]+)'));
+    if(csrfToken) {
+      this.httpOptions.headers = new HttpHeaders({
+        'Content-Type'  : 'application/json',
+        'Csrf-Token'    : `${csrfToken[2]}`
+      })
+    }
   }
 
   /** TodoServiceのメッセージをMessageServiceを使って記録 */

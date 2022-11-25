@@ -27,7 +27,7 @@ export class CategoryListComponent implements OnInit {
 
   getCategoryList(): void {
     this.categoryService.getCategoryList().subscribe(
-      categoryList => this.categoryList = categoryList
+      categoryList => this.categoryList = categoryList.filter(_ => _.id != 6)
     )
   }
 

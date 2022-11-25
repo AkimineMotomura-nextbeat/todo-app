@@ -60,7 +60,8 @@ export class CategoryService {
 
   /** POST: サーバーに新しいCategoryを登録する */
   addCategory(category: Category): Observable<Category> {
-    console.log(category)
+    this.setCsrfToken();
+
     return this.http.post<Category>(this.categoryUrl, JSON.stringify(category), this.httpOptions).pipe(
       tap((newCategory: Category) => this.log(`added category w/ id=${newCategory.id}`)),
       catchError(this.handleError<Category>('addCategory'))
@@ -69,7 +70,10 @@ export class CategoryService {
 
   /** PUT: サーバー上でヒーローを更新 */
   updateCategory(category: Category): Observable<any> {
-    return this.http.put(this.categoryUrl, category, this.httpOptions).pipe(
+    this.setCsrfToken();
+    const url = `${this.categoryUrl}/${category.id}`
+    
+    return this.http.put(url, category, this.httpOptions).pipe(
       tap(_ => this.log(`update category id=${category.id}`)),
       catchError(this.handleError<any>('updateCategory'))
     );
@@ -77,12 +81,23 @@ export class CategoryService {
 
   /** DELETE: サーバーからヒーローを削除 */
   deleteCategory(id: number): Observable<Category> {
+    this.setCsrfToken();
     const url = `${this.categoryUrl}/${id}`;
 
     return this.http.delete<Category>(url, this.httpOptions).pipe(
       tap(_ => this.log(`deleted Category id=${id}`)),
       catchError(this.handleError<Category>('deleteCategory'))
     );
+  }
+
+  setCsrfToken(): void {
+    const csrfToken = document.cookie.match(new RegExp('(^|)' + 'csrf_token' + '=([^;]+)'));
+    if(csrfToken) {
+      this.httpOptions.headers = new HttpHeaders({
+        'Content-Type'  : 'application/json',
+        'Csrf-Token'    : `${csrfToken[2]}`
+      })
+    }
   }
 
   /** CategoryServiceのメッセージをMessageServiceを使って記録 */
