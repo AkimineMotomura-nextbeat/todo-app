@@ -49,7 +49,7 @@ export class CategoryNewComponent implements OnInit {
       id    : 0,
       name  : this.nameForm.value,
       slug  : this.slugForm.value,
-      color : this.colorForm.value
+      color : Number(this.colorForm.value)
     }).subscribe(() => this.goBack());
   }
 

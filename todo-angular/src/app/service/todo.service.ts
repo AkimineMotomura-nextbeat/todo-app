@@ -5,6 +5,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs';
 
 import { Todo } from '../models/todo';
+import { TodoState } from '../models/todoState';
 
 @Injectable({
   providedIn: 'root'
@@ -35,6 +36,13 @@ export class TodoService {
       tap(_ => this.log(`fetched todo id=${id}`)),
       catchError(this.handleError<Todo>(`getTodo id=${id}`))
     );
+  }
+
+  getTodoState(): Observable<TodoState[]> {
+    const url= `${this.todoUrl}/state`
+    return this.http.get<TodoState[]>(url).pipe(
+      catchError(this.handleError<TodoState[]>('getTodoState', []))
+    )
   }
 
   /* 検索語を含むヒーローを取得する */

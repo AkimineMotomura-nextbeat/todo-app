@@ -1,11 +1,60 @@
 <div *ngIf="todo">
 
-  <h2>{{todo.title | uppercase}} Details</h2>
-  <div><span>id: </span>{{todo.id}}</div>
-  <div>
-    <label for="todo_title">Todo title: </label>
-    <input id="todo_title" [(ngModel)]="todo.title" placeholder="title">
-  </div>
-  <button type="button" (click)="goBack()">go back</button>
-  <button type="button" (click)="save()">save</button>
+  <h2>{{todo.title | uppercase}} の編集</h2>
+
+  <form [formGroup]="todoForm">
+    <dl>
+      <dt>
+        タイトル
+      </dt>
+      <dd>
+        <input formControlName="title">
+        <div *ngIf="titleForm.invalid && (titleForm.dirty || titleForm.touched)">
+          <div *ngIf="titleForm.errors?.['required']">
+            タイトルを入力してください。
+          </div>
+        </div>
+      </dd>
+    </dl>
+    <dl>
+      <dt>
+        本文
+      </dt>
+      <dd>
+        <textarea formControlName="content"></textarea>
+      </dd>
+    </dl>
+    <dl>
+      <dt>
+        カテゴリ
+      </dt>
+      <dd>
+        <select formControlName="category">
+          <option *ngFor="let category of categoryList" [value]="category.id">
+            {{category.name}}
+          </option>
+        </select>
+        <div *ngIf="categoryForm.invalid && (categoryForm.dirty || categoryForm.touched)">
+          <div *ngIf="categoryForm.errors?.['required']">
+            カテゴリを入力してください。
+          </div>
+        </div>
+      </dd>
+    </dl>
+    <dl>
+      <dt>
+        進行状況
+      </dt>
+      <dd>
+        <select formControlName="state">
+          <option *ngFor="let state of stateList" [value]="state.id">
+            {{state.name}}
+          </option>
+        </select>
+      </dd>
+    </dl>
+  </form>
+
+  <button mat-flat-button type="button" (click)="goBack()">go back</button>
+  <button mat-flat-button type="button" (click)="save()">save</button>
 </div>

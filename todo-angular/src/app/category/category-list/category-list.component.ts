@@ -17,7 +17,7 @@ export class CategoryListComponent implements OnInit {
 
   constructor(
     private location        : Location,
-    private categoryService : CategoryService
+    public categoryService : CategoryService
   ) { }
 
   ngOnInit(): void {

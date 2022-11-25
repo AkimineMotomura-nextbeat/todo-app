@@ -12,6 +12,7 @@ import { CategoryListComponent } from './category/category-list/category-list.co
 import { CategoryDetailComponent } from './category/category-detail/category-detail.component';
 import { TodoNewComponent } from './todo/todo-new/todo-new.component';
 import { CategoryNewComponent } from './category/category-new/category-new.component';
+import { MatButtonModule } from '@angular/material/button'
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { CategoryNewComponent } from './category/category-new/category-new.compo
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatButtonModule
   ],
   providers: [],
   bootstrap: [AppComponent]

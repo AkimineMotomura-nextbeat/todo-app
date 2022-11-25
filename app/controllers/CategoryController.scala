@@ -40,7 +40,7 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
     for {
       categorys <- categoryRepos.all
     } yield {
-      val jsValue = categorys.filter(_.id != Category.noCategory_id).map(JsValueCategory.apply(_))
+      val jsValue = categorys.map(JsValueCategory.apply(_))
       Ok(Json.toJson(jsValue))
     }
   }
@@ -78,12 +78,13 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
   def update(id: Long) = Action(parse.json) async { implicit request =>
     request.body.validate[JsValueCreateCategory].fold(
       errors => {
-        //TODO: どうするのが良いか考える
+        //TODO: Logに書き込む等
         Future.successful(BadRequest("Request data is unacceptable"))
       },
       categoryData => {
         //DBのデータをupdate
-        for {
+        if(id != Category.noCategory_id){
+          for {
           category_old <- categoryRepos.get(Category.Id(id))
           response <- category_old match {
             case None => Future.successful(None)
@@ -96,6 +97,9 @@ class CategoryController @Inject()(val controllerComponents: ControllerComponent
             case None     => BadRequest("Requested category is not exist") //category(id)が存在しないため更新不可
             case Some(_)  => Ok("updated successfully") //成功
           }
+        }
+        }else{
+          Future.successful(BadRequest("Invalid id"))
         }
       }
     )

@@ -1,1 +1,45 @@
-<p>todo-new works!</p>
+<h2>TODO新規作成</h2>
+
+<form [formGroup]="todoForm">
+  <dl>
+    <dt>
+      タイトル
+    </dt>
+    <dd>
+      <input formControlName="title">
+      <div *ngIf="titleForm.invalid && (titleForm.dirty || titleForm.touched)">
+        <div *ngIf="titleForm.errors?.['required']">
+          タイトルを入力してください。
+        </div>
+      </div>
+    </dd>
+  </dl>
+  <dl>
+    <dt>
+      本文
+    </dt>
+    <dd>
+      <textarea formControlName="content"></textarea>
+    </dd>
+  </dl>
+  <dl>
+    <dt>
+      カテゴリ
+    </dt>
+    <dd>
+      <select formControlName="category">
+        <option *ngFor="let category of categoryList" [value]="category.id">
+          {{category.name}}
+        </option>
+      </select>
+      <div *ngIf="categoryForm.invalid && (categoryForm.dirty || categoryForm.touched)">
+        <div *ngIf="categoryForm.errors?.['required']">
+          カテゴリを入力してください。
+        </div>
+      </div>
+    </dd>
+  </dl>
+</form>
+
+<button mat-flat-button color="basic" type="button" (click)="goBack()">go back</button>
+<button mat-flat-button color="primary" type="button" (click)="save()">save</button>

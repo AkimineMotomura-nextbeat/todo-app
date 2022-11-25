@@ -67,6 +67,11 @@ class TodoController @Inject()(val controllerComponents: ControllerComponents, v
     }
   }
 
+  def todoState() = Action { implicit req =>
+    val jsValue = Todo.Status.values.map(JsValueStatus.apply(_))
+    Ok(Json.toJson(jsValue))
+  }
+
   /**
     * POST /api/todo/:id/update
     */
