@@ -7,6 +7,7 @@ import { Validators } from '@angular/forms';
 import { Category } from '../../models/category';
 import { CategoryService } from '../../service/category.service';
 import { CategoryColor } from 'src/app/models/color';
+import { todoApp } from 'src/app/constant';
 
 @Component({
   selector: 'app-category-new',
@@ -26,7 +27,7 @@ export class CategoryNewComponent implements OnInit {
     this.categoryForm = new FormGroup({
       name  : new FormControl('', Validators.required),
       slug  : new FormControl('', Validators.pattern('[a-zA-Z0-9]+')),
-      color : new FormControl(0)
+      color : new FormControl(todoApp.DEFAULT_COLOR)
     })
   }
 
@@ -47,7 +48,7 @@ export class CategoryNewComponent implements OnInit {
   save(): void {
     if(!this.nameForm.invalid && !this.slugForm.invalid){
       this.categoryService.addCategory({
-        id    : 0,
+        id    : todoApp.UNSET_CATEGORY_ID,
         name  : this.nameForm.value,
         slug  : this.slugForm.value,
         color : Number(this.colorForm.value)

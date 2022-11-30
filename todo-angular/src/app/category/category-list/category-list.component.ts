@@ -4,6 +4,7 @@ import { Location } from '@angular/common';
 import { Category } from '../../models/category';
 import { CategoryColor } from 'src/app/models/color';
 import { CategoryService } from '../../service/category.service';
+import { todoApp } from 'src/app/constant';
 
 @Component({
   selector: 'app-category-list',
@@ -27,7 +28,7 @@ export class CategoryListComponent implements OnInit {
 
   getCategoryList(): void {
     this.categoryService.getCategoryList().subscribe(
-      categoryList => this.categoryList = categoryList.filter(_ => _.id != 6)
+      categoryList => this.categoryList = categoryList.filter(_ => _.id != todoApp.NO_CATEGORY_ID)
     )
   }
 

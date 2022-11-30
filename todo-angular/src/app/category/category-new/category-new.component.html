@@ -2,11 +2,11 @@
 
 <form [formGroup]="categoryForm">
   <dl>
-    <dt>
-      カテゴリ名
-    </dt>
     <dd>
-      <input formControlName="name">
+      <mat-form-field appearance="fill">
+        <mat-label>カテゴリ名</mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
       <div *ngIf="nameForm.invalid && (nameForm.dirty || nameForm.touched)">
         <div *ngIf="nameForm.errors?.['required']">
           カテゴリ名を入力してください。
@@ -15,11 +15,11 @@
     </dd>
   </dl>
   <dl>
-    <dt>
-      略称(半角英数字のみ)
-    </dt>
     <dd>
-      <input formControlName="slug">
+      <mat-form-field appearance="fill">
+        <mat-label>略称(半角英数字のみ)</mat-label>
+        <input matInput formControlName="slug">
+      </mat-form-field>
       <div *ngIf="slugForm.invalid && (slugForm.dirty || slugForm.touched)">
         <div *ngIf="slugForm.errors?.['pattern']">
           半角英数字で入力してください
@@ -28,18 +28,18 @@
     </dd>
   </dl>
   <dl>
-    <dt>
-      カテゴリカラー
-    </dt>
     <dd>
-      <select formControlName="color">
-        <option *ngFor="let color of categoryColorList" [value]="color.id">
-          {{color.name}}
-        </option>
-      </select>
+      <mat-form-field appearance="fill">
+        <mat-label>カテゴリカラー</mat-label>
+        <mat-select formControlName="color">
+          <mat-option *ngFor="let color of categoryColorList" [value]="color.id">
+            {{color.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
     </dd>
   </dl>
 </form>
 
-<button mat-flat-button type="button" (click)="goBack()">go back</button>
-<button mat-flat-button type="button" (click)="save()">save</button>
+<button mat-stroked-button type="button" (click)="goBack()">go back</button>
+<button mat-flat-button type="button" color="primary" (click)="save()">save</button>

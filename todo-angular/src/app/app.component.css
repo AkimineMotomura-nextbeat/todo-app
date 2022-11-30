@@ -19,8 +19,7 @@
 }
 
 main {
-  width:      70vw;
-  margin:     100px auto;
+  margin:     100px 50px;
   padding:    100px;
   box-shadow: 0 0 4px gray;
   position:   relative;

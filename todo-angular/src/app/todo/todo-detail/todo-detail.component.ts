@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Validators } from '@angular/forms';
 
+import { todoApp } from 'src/app/constant';
 import { Todo } from '../../models/todo';
 import { Category } from 'src/app/models/category';
 import { TodoState } from 'src/app/models/todoState';
@@ -32,8 +33,8 @@ export class TodoDetailComponent implements OnInit {
     this.todoForm = new FormGroup({
       title     : new FormControl('', Validators.required),
       content   : new FormControl(''),
-      category  : new FormControl(6, Validators.required),
-      state     : new FormControl(0)
+      category  : new FormControl(todoApp.NO_CATEGORY_ID, Validators.required),
+      state     : new FormControl(todoApp.DEFAULT_STATE)
     })
   }
 

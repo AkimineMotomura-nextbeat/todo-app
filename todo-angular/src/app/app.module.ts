@@ -3,6 +3,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule} from '@angular/material/input';
+import { MatSelectModule} from '@angular/material/select'
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -12,7 +16,6 @@ import { CategoryListComponent } from './category/category-list/category-list.co
 import { CategoryDetailComponent } from './category/category-detail/category-detail.component';
 import { TodoNewComponent } from './todo/todo-new/todo-new.component';
 import { CategoryNewComponent } from './category/category-new/category-new.component';
-import { MatButtonModule } from '@angular/material/button'
 
 @NgModule({
   declarations: [
@@ -30,7 +33,10 @@ import { MatButtonModule } from '@angular/material/button'
     FormsModule,
     HttpClientModule,
     ReactiveFormsModule,
-    MatButtonModule
+    MatButtonModule,
+    MatInputModule,
+    MatSelectModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

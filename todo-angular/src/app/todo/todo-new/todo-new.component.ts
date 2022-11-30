@@ -8,6 +8,7 @@ import { Todo } from '../../models/todo';
 import { Category } from 'src/app/models/category';
 import { TodoService } from '../../service/todo.service';
 import { CategoryService } from 'src/app/service/category.service';
+import { todoApp } from 'src/app/constant';
 
 @Component({
   selector: 'app-todo-new',
@@ -28,7 +29,7 @@ export class TodoNewComponent implements OnInit {
     this.todoForm = new FormGroup({
       title:    new FormControl('', Validators.required),
       content:  new FormControl(''),
-      category: new FormControl(6)
+      category: new FormControl(todoApp.NO_CATEGORY_ID)
     })
   }
 
@@ -49,11 +50,11 @@ export class TodoNewComponent implements OnInit {
   save(): void {
     if(!this.titleForm.invalid){
       this.todoService.addTodo({
-        id      : 0,
+        id      : todoApp.UNSET_TODO_ID,
         category: Number(this.categoryForm.value),
         title   : this.titleForm.value,
         content : this.contentForm.value,
-        state   : 0
+        state   : todoApp.DEFAULT_STATE
       }).subscribe(() => this.goBack());
     }
   }

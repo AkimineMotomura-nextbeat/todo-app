@@ -4,11 +4,11 @@
 
   <form [formGroup]="todoForm">
     <dl>
-      <dt>
-        タイトル
-      </dt>
       <dd>
-        <input formControlName="title">
+        <mat-form-field appearance="fill">
+          <mat-label>タイトル</mat-label>
+          <input matInput formControlName="title">
+        </mat-form-field>
         <div *ngIf="titleForm.invalid && (titleForm.dirty || titleForm.touched)">
           <div *ngIf="titleForm.errors?.['required']">
             タイトルを入力してください。
@@ -17,23 +17,23 @@
       </dd>
     </dl>
     <dl>
-      <dt>
-        本文
-      </dt>
       <dd>
-        <textarea formControlName="content"></textarea>
+        <mat-form-field appearance="fill">
+          <mat-label>本文</mat-label>
+          <textarea matInput formControlName="content"></textarea>
+        </mat-form-field>
       </dd>
     </dl>
     <dl>
-      <dt>
-        カテゴリ
-      </dt>
       <dd>
-        <select formControlName="category">
-          <option *ngFor="let category of categoryList" [value]="category.id">
-            {{category.name}}
-          </option>
-        </select>
+        <mat-form-field appearance="fill">
+          <mat-label>カテゴリ</mat-label>
+          <mat-select formControlName="category">
+            <mat-option *ngFor="let category of categoryList" [value]="category.id">
+              {{category.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
         <div *ngIf="categoryForm.invalid && (categoryForm.dirty || categoryForm.touched)">
           <div *ngIf="categoryForm.errors?.['required']">
             カテゴリを入力してください。
@@ -42,19 +42,19 @@
       </dd>
     </dl>
     <dl>
-      <dt>
-        進行状況
-      </dt>
       <dd>
-        <select formControlName="state">
-          <option *ngFor="let state of stateList" [value]="state.id">
-            {{state.name}}
-          </option>
-        </select>
+        <mat-form-field appearance="fill">
+          <mat-label>進行ステータス</mat-label>
+          <mat-select formControlName="state">
+            <mat-option *ngFor="let state of stateList" [value]="state.id">
+              {{state.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
       </dd>
     </dl>
   </form>
 
-  <button mat-flat-button type="button" (click)="goBack()">go back</button>
-  <button mat-flat-button type="button" (click)="save()">save</button>
+  <button mat-stroked-button type="button" color="basic" (click)="goBack()">go back</button>
+  <button mat-flat-button type="button" color="primary" (click)="save()">save</button>
 </div>
