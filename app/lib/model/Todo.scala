@@ -32,7 +32,7 @@ object Todo {
     }
 
     def apply(title: String, content: String, category: Category.Id): WithNoId = {
-        new Entity.WithNoId(
+        Entity.WithNoId.apply(
             new Todo(
                 id = None,
                 title = title,

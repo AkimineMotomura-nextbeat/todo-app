@@ -1,0 +1,45 @@
+<h2>カテゴリ詳細編集</h2>
+
+<form [formGroup]="categoryForm">
+  <dl>
+    <dd>
+      <mat-form-field appearance="fill">
+        <mat-label>カテゴリ名</mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
+      <div *ngIf="nameForm.invalid && (nameForm.dirty || nameForm.touched)">
+        <div *ngIf="nameForm.errors?.['required']">
+          カテゴリ名を入力してください。
+        </div>
+      </div>
+    </dd>
+  </dl>
+  <dl>
+    <dd>
+      <mat-form-field appearance="fill">
+        <mat-label>略称(半角英数字のみ)</mat-label>
+        <input matInput formControlName="slug">
+      </mat-form-field>
+      <div *ngIf="slugForm.invalid && (slugForm.dirty || slugForm.touched)">
+        <div *ngIf="slugForm.errors?.['pattern']">
+          半角英数字で入力してください
+        </div>
+      </div>
+    </dd>
+  </dl>
+  <dl>
+    <dd>
+      <mat-form-field appearance="fill">
+        <mat-label></mat-label>
+        <mat-select formControlName="color">
+          <mat-option *ngFor="let color of categoryColorList" [value]="color.id">
+            {{color.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </dd>
+  </dl>
+</form>
+
+<button mat-stroked-button type="button" (click)="goBack()">go back</button>
+<button mat-flat-button type="button" color="primary" (click)="save()">save</button>

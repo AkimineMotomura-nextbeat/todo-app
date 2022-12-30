@@ -1,0 +1,60 @@
+<div *ngIf="todo">
+
+  <h2>{{todo.title | uppercase}} の編集</h2>
+
+  <form [formGroup]="todoForm">
+    <dl>
+      <dd>
+        <mat-form-field appearance="fill">
+          <mat-label>タイトル</mat-label>
+          <input matInput formControlName="title">
+        </mat-form-field>
+        <div *ngIf="titleForm.invalid && (titleForm.dirty || titleForm.touched)">
+          <div *ngIf="titleForm.errors?.['required']">
+            タイトルを入力してください。
+          </div>
+        </div>
+      </dd>
+    </dl>
+    <dl>
+      <dd>
+        <mat-form-field appearance="fill">
+          <mat-label>本文</mat-label>
+          <textarea matInput formControlName="content"></textarea>
+        </mat-form-field>
+      </dd>
+    </dl>
+    <dl>
+      <dd>
+        <mat-form-field appearance="fill">
+          <mat-label>カテゴリ</mat-label>
+          <mat-select formControlName="category">
+            <mat-option *ngFor="let category of categoryList" [value]="category.id">
+              {{category.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div *ngIf="categoryForm.invalid && (categoryForm.dirty || categoryForm.touched)">
+          <div *ngIf="categoryForm.errors?.['required']">
+            カテゴリを入力してください。
+          </div>
+        </div>
+      </dd>
+    </dl>
+    <dl>
+      <dd>
+        <mat-form-field appearance="fill">
+          <mat-label>進行ステータス</mat-label>
+          <mat-select formControlName="state">
+            <mat-option *ngFor="let state of stateList" [value]="state.id">
+              {{state.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </dd>
+    </dl>
+  </form>
+
+  <button mat-stroked-button type="button" color="basic" (click)="goBack()">go back</button>
+  <button mat-flat-button type="button" color="primary" (click)="save()">save</button>
+</div>

@@ -1,0 +1,45 @@
+<h2>TODO新規作成</h2>
+
+<form [formGroup]="todoForm">
+  <dl>
+    <dd>
+      <mat-form-field appearance="fill">
+        <mat-label>タイトル</mat-label>
+        <input matInput formControlName="title">
+      </mat-form-field>
+      <div *ngIf="titleForm.invalid && (titleForm.dirty || titleForm.touched)">
+        <div *ngIf="titleForm.errors?.['required']">
+          タイトルを入力してください。
+        </div>
+      </div>
+    </dd>
+  </dl>
+  <dl>
+    <dd>
+    <mat-form-field appearance="fill">
+      <mat-label>本文</mat-label>
+      <textarea matInput formControlName="content"></textarea>
+    </mat-form-field>
+    </dd>
+  </dl>
+  <dl>
+    <dd>
+      <mat-form-field appearance="fill">
+        <mat-label>カテゴリ</mat-label>
+        <mat-select formControlName="category">
+          <mat-option *ngFor="let category of categoryList" [value]="category.id">
+            {{category.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <div *ngIf="categoryForm.invalid && (categoryForm.dirty || categoryForm.touched)">
+        <div *ngIf="categoryForm.errors?.['required']">
+          カテゴリを入力してください。
+        </div>
+      </div>
+    </dd>
+  </dl>
+</form>
+
+<button mat-stroked-button color="basic" type="button" (click)="goBack()">go back</button>
+<button mat-flat-button color="primary" type="button" (click)="save()">save</button>
